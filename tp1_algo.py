@@ -1,12 +1,15 @@
 
 class Case:
-    def __init__(self):
-        self.valeur = 0
+    def __init__(self, val=0):
+        self.valeur = val
         self.listeFleches = []
 
 
-seq1 = "AGTCAGGCA"
-seq2 = "GCTACCA"
+#seq1 = "AGTCAGGCA"
+#seq2 = "GCTACCA"
+
+seq1 = "AGT"
+seq2 = "GCTA"
 
 poidsMatch = 4
 poidsMismatch = -4
@@ -18,36 +21,31 @@ poidsIndel = -8
 lenSeq1 = len(seq1)
 lenSeq2 = len(seq2)
 
-"""matriceTotale = list([range(0, lenSeq1+1), range(0, lenSeq2+1)])"""
-matriceTotale = [[Case() for j in range(lenSeq1 + 1)] for i in range(lenSeq2 + 1)]
-from pprint import pprint
-pprint(matriceTotale)
-#matriceTotale = list([Case() for j in range(lenSeq1 + 1), for i in range(lenSeq2 + 1)])
-
+matriceTotale = [[Case() for i in range(lenSeq1+1)] for j in range(lenSeq2 + 1)]
 
 
 def main():
     initialiserCol()
     initialiserLig()
     calculerScore()
+    print("\n")
     prettyPrint()
 
 
 def calculerScore():
-    """write me plz"""
-    for i in range (1, lenSeq1+1):
-        for j in range (1, lenSeq2+1):
-            print (matriceTotale[i-1][j].valeur)
+    prettyPrint()
+    for i in range (1, lenSeq1+2):
+        for j in range (1, lenSeq2):
             res1 = matriceTotale[i-1][j].valeur+poidsIndel
             res2 = matriceTotale[i][j-1].valeur+poidsIndel
             res3 = matriceTotale[i-1][j-1].valeur
-
-            if seq1[i] == seq1[j]:
+            if seq1[j-1] == seq2[i-1]:
                 res3 += poidsMatch
             else:
                 res3 += poidsMismatch
 
-            matriceTotale[i][j] = max(res1,res2,res3)
+            matriceTotale[i][j].valeur = max(res1,res2,res3)
+            #TOFO: vérifier quand plus qu'un égal
             current = matriceTotale[i][j]
 
             #fleches
@@ -60,19 +58,24 @@ def calculerScore():
 
 
 def initialiserCol():
-    for i in range(0,lenSeq1+1):
-        matriceTotale[0][i] = 0
+    for i in range(lenSeq1+1):
+        matriceTotale[0][i] = Case()
 
 
 def initialiserLig():
-    for i in range (0,lenSeq2+1):
-        matriceTotale[i][0] = i*poidsIndel
+    for i in range (lenSeq2+1):
+        matriceTotale[i][0] = Case(i*poidsIndel)
+
 
 def prettyPrint():
-    for i in range(0, lenSeq1 + 1):
-        for j in range(0, lenSeq2 + 1):
+    for i in range(0, lenSeq1+2):
+        for j in range(0, lenSeq2):
+            #print("Rangée :", i, " Colonne :", j, " Valeur :", matriceTotale[i][j].valeur," \n ")
             print(matriceTotale[i][j].valeur," ")
-        print ("\n")
+
+    #for val in matriceTotale:
+    #matrix = "\n".join([" ".join([matriceTotale[i][j].valeur for i in range(lenSeq1)]) for y in range(lenSeq2)])
+    #print (matrix)
 
 
 if __name__ == "__main__":
