@@ -104,11 +104,30 @@ def startingPos(matrice):
   return start
 
 ### sequence pathing
-def sequencePath(matrice, position):
-  global seq1
-  global seq2
-
-
+def sequencePath(matrice, pos):
+  x = pos[0,0]
+  y = pos[0,1]
+  path = []
+  current = matrice[x][y]
+  last = matrice[x-1][y-1]
+  path.append(current)
+  while last > 0:
+    last = matrice[x - 1][y - 1]
+    if (current - MISMATCH == last) or (current-MATCH == last):
+      path.append(last)
+      x-=1
+      y-=1
+    else :
+      last = matrice[x - 1][y]
+      if (current - INDEL == last):
+        path.append(last)
+        x -= 1
+      else:
+        last = matrice[x][y-1]
+        path.append(last)
+        y -= 1
+    print ("a reflechir, peut-on aller vers un chiffre qui augmente?")
+  return path
 
 ### main
 def main():
@@ -120,6 +139,11 @@ def main():
   sequences2 = fetchSequences("reads.fq")
   print(matrice)
   print(sequences1[-1])
+
+  path = sequencePath(matrice,start)
+  for ele in path:
+    print ele
+
   return None
 
 
