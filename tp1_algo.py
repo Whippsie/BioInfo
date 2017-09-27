@@ -34,7 +34,7 @@ def main():
 
 def calculerScore():
     prettyPrint()
-    for i in range (1, lenSeq1+2):
+    for i in range (1, lenSeq1+1):
         for j in range (1, lenSeq2):
             res1 = matriceTotale[i-1][j].valeur+poidsIndel
             res2 = matriceTotale[i][j-1].valeur+poidsIndel
@@ -45,7 +45,7 @@ def calculerScore():
                 res3 += poidsMismatch
 
             matriceTotale[i][j].valeur = max(res1,res2,res3)
-            #TOFO: vérifier quand plus qu'un égal
+            #TOFO: verifier quand plus qu'un egal
             current = matriceTotale[i][j]
 
             #fleches
@@ -64,15 +64,16 @@ def initialiserCol():
 
 def initialiserLig():
     for i in range (lenSeq2+1):
-        matriceTotale[i][0] = Case(i*poidsIndel)
+        matriceTotale[i][0] = Case()
 
 
 def prettyPrint():
-    for i in range(0, lenSeq1+2):
-        for j in range(0, lenSeq2):
-            #print("Rangée :", i, " Colonne :", j, " Valeur :", matriceTotale[i][j].valeur," \n ")
+    for i in range(lenSeq1+1):
+        for j in range(lenSeq2+1):
+            #print("Rangee :", i, " Colonne :", j, " Valeur :", matriceTotale[i][j].valeur," \n ")
             print(matriceTotale[i][j].valeur," ")
 
+        print ("\n")
     #for val in matriceTotale:
     #matrix = "\n".join([" ".join([matriceTotale[i][j].valeur for i in range(lenSeq1)]) for y in range(lenSeq2)])
     #print (matrix)

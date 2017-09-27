@@ -117,7 +117,7 @@ def main():
   matrice = fillMatrix(matrice, sequences1)
   start = startingPos(matrice)
   print(start)
-  sequences2 = fetchSequences("reads.fq.txt")
+  sequences2 = fetchSequences("reads.fq")
   print(matrice)
   print(sequences1[-1])
   return None
