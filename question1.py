@@ -109,24 +109,23 @@ def sequencePath(matrice, pos):
   y = pos[0,1]
   path = []
   current = matrice[x][y]
-  path.append(current)
   while ((x > 0) and (y > 0)):
     if (current - MISMATCH == matrice[x-1][y-1]) or (current - MATCH == matrice[x-1][y-1]):
       x -= 1
       y -= 1
       current = matrice[x][y]
-      path.append(current)
+      path.append([1,1])
     elif (current - INDEL == matrice[x-1][y]):
       x -= 1
       current = matrice[x][y]
-      path.append(current)
+      path.append([1,0])
     elif (current - INDEL == matrice[x][y-1]):
       y -= 1
       current = matrice[x][y]
-      path.append(current)
+      path.append([0,1])
     else:
-      break
-  return path
+      raise Exception("Score match pas avec algo")
+  return path, np.array([[x,y]])
 
 ### main
 def main():
@@ -139,9 +138,8 @@ def main():
   print(matrice)
   print(sequences1[-1])
 
-  path = sequencePath(matrice,start)
-  for ele in path:
-    print(ele)
+  path,end = sequencePath(matrice,start)
+  print(start, path, end)
 
   return None
 
