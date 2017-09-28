@@ -94,6 +94,7 @@ def starter(list):
 def startingPos(matrice):
   ### on trouve le(s) point de départ selon le choix.
   start = np.argwhere(matrice == np.amax(matrice)) ##
+  #print ("starting position ",start)
   if len(start) > 1:
     if WANTEDSEQUENCES == 'last':
       start = starter(start)
@@ -109,22 +110,31 @@ def sequencePath(matrice, pos):
   y = pos[0,1]
   path = []
   current = matrice[x][y]
-  while ((x > 0) and (y > 0)):
-    if (current - MISMATCH == matrice[x-1][y-1]) or (current - MATCH == matrice[x-1][y-1]):
-      x -= 1
-      y -= 1
-      path.append([1,1])
-    elif (current - INDEL == matrice[x-1][y]):
-      x -= 1
+  while ((x > 0) or (y > 0)):
+    if (current!=0):
+      if (current - MISMATCH == matrice[x-1][y-1]) or (current - MATCH == matrice[x-1][y-1]):
+        x -= 1
+        y -= 1
+        path.append([1,1])
+        #print (matrice[x-1][y-1])
+      elif (current - INDEL == matrice[x-1][y]):
+        x -= 1
+        current = matrice[x][y]
+        path.append([1,0])
+      elif (current - INDEL == matrice[x][y-1]):
+        y -= 1
+        current = matrice[x][y]
+        path.append([0,1])
+      else:
+        raise Exception("Score match pas avec algo")
       current = matrice[x][y]
-      path.append([1,0])
-    elif (current - INDEL == matrice[x][y-1]):
-      y -= 1
-      current = matrice[x][y]
-      path.append([0,1])
     else:
-      raise Exception("Score match pas avec algo")
-    current = matrice[x][y]
+      if x>0:
+        x -= 1
+        path.append([1,0])
+      else:
+        y -= 1
+        path.append([0,1])
   return path, np.array([x,y])
 
 ### alignement des séquences selon un chemin connue
@@ -178,13 +188,15 @@ def alignSequences(start, path, seqs):
 
 ### main
 def main():
-  sequences1 = fetchSequences("test.txt")
+  #sequences1 = fetchSequences("test.txt")
+  sequences1 = ["GTAGACC","AGCGTAGA"]
   matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1]))
   matrice = fillMatrix(matrice, sequences1)
+  print (matrice)
   start = startingPos(matrice)
   sequences2 = fetchSequences("reads.fq")
   path,end = sequencePath(matrice,start)
-  print(path)
+  print (path)
   aligned = alignSequences(end, path, sequences1)
   print(aligned[0])
   print(aligned[1])
