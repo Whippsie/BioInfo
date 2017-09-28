@@ -109,24 +109,23 @@ def sequencePath(matrice, pos):
   y = pos[0,1]
   path = []
   current = matrice[x][y]
-  last = matrice[x-1][y-1]
   path.append(current)
-  while last > 0:
-    last = matrice[x - 1][y - 1]
-    if (current - MISMATCH == last) or (current-MATCH == last):
-      path.append(last)
-      x-=1
-      y-=1
-    else :
-      last = matrice[x - 1][y]
-      if (current - INDEL == last):
-        path.append(last)
-        x -= 1
-      else:
-        last = matrice[x][y-1]
-        path.append(last)
-        y -= 1
-    print ("a reflechir, peut-on aller vers un chiffre qui augmente?")
+  while ((x > 0) and (y > 0)):
+    if (current - MISMATCH == matrice[x-1][y-1]) or (current - MATCH == matrice[x-1][y-1]):
+      x -= 1
+      y -= 1
+      current = matrice[x][y]
+      path.append(current)
+    elif (current - INDEL == matrice[x-1][y]):
+      x -= 1
+      current = matrice[x][y]
+      path.append(current)
+    elif (current - INDEL == matrice[x][y-1]):
+      y -= 1
+      current = matrice[x][y]
+      path.append(current)
+    else:
+      break
   return path
 
 ### main
@@ -142,7 +141,7 @@ def main():
 
   path = sequencePath(matrice,start)
   for ele in path:
-    print ele
+    print(ele)
 
   return None
 
