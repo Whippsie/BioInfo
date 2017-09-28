@@ -113,7 +113,6 @@ def sequencePath(matrice, pos):
     if (current - MISMATCH == matrice[x-1][y-1]) or (current - MATCH == matrice[x-1][y-1]):
       x -= 1
       y -= 1
-      current = matrice[x][y]
       path.append([1,1])
     elif (current - INDEL == matrice[x-1][y]):
       x -= 1
@@ -125,7 +124,57 @@ def sequencePath(matrice, pos):
       path.append([0,1])
     else:
       raise Exception("Score match pas avec algo")
-  return path, np.array([[x,y]])
+    current = matrice[x][y]
+  return path, np.array([x,y])
+
+### alignement des séquences selon un chemin connue
+def alignSequences(start, path, seqs):
+  seqLength = sum(start) + len(path)
+  seq1 = seqs[1].strip("\n")
+  seq2 = seqs[0].strip("\n")
+  seq1align = ""
+  seq2align = ""
+  y = 0
+  z = 0
+  ### initialisation des indels pour le préfixe
+  if start[0] > 0:
+    length = len(seq2)
+    x = start[0]
+    while x > 0:
+      seq1align = seq1align + "-"
+      x -= 1
+      seq2align = seq2align + seq2[y]
+      y += 1
+
+  elif start[1] > 0:
+    length = len(seq1)
+    x = start[1]
+    while x > 0:
+      seq2align = seq2align + "-"
+      x -= 1
+      seq1align = seq1align + seq1[z]
+      z += 1
+  else:
+    pass
+
+  ### ajout des séquences de chemin
+  i = 0
+  while i < len(path):
+    if path[i][0] == 1:
+      seq1align = seq1align + seq1[z]
+      z += 1
+    else:
+      seq1align = seq1align + "-"
+
+    if path[i][1] == 1:
+      seq2align = seq2align + seq2[y]
+      y += 1
+    else: seq2align = seq2align + "-"
+    i +=1
+
+  ### complétion de la séquence
+
+  return [seq1align, seq2align]
 
 ### main
 def main():
@@ -133,13 +182,12 @@ def main():
   matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1]))
   matrice = fillMatrix(matrice, sequences1)
   start = startingPos(matrice)
-  print(start)
   sequences2 = fetchSequences("reads.fq")
-  print(matrice)
-  print(sequences1[-1])
-
   path,end = sequencePath(matrice,start)
-  print(start, path, end)
+  print(path)
+  aligned = alignSequences(end, path, sequences1)
+  print(aligned[0])
+  print(aligned[1])
 
   return None
 
