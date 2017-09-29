@@ -190,20 +190,23 @@ def alignSequences(start, path, seqs, end, size):
     else:
       break
 
-  return [seq1align, seq2align]
+  return [seq1align, seq2align], i
 
 ### main
 def main():
+  cheval = "1"
   sequences1 = fetchSequences("test.txt")
   matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1])-1)
   matrice = fillMatrix(matrice, sequences1)
   start = startingPos(matrice)
+  score = np.amax(matrice)
   sequences2 = fetchSequences("reads.fq")
   path,end = sequencePath(matrice,start, sequences1[0], sequences1[1])
-  aligned = alignSequences(end, path, sequences1, start, matrice.shape)
-  print(aligned[0])
-  print(aligned[1])
-
+  aligned, cheval = alignSequences(end, path, sequences1, start, matrice.shape)
+  print("Sequence 1: " + aligned[0])
+  print("Sequence 2: " + aligned[1])
+  print("Chevauchement: " + str(cheval))
+  print("Score: " + str(score))
   return None
 
 
