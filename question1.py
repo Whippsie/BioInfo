@@ -184,7 +184,6 @@ def alignSequences(start, path, seqs, end, size):
   ### complétion de la séquence
   #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
   size_int = size[0] - 1
-  #TODO: Trouver une condition moins dégueux
   if end[0][0]<size_int:
     x = end[0][0]
     while x<size_int:
