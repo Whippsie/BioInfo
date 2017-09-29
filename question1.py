@@ -204,12 +204,9 @@ def alignSequences(start, path, seqs, end, size):
 def main():
   sequences1 = fetchSequences("test.txt")
   #sequences1 = ["GTAGACC","AGCGTAGA"]
-  matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1]))
-  print (len(sequences1[0]), " ", len(sequences1[1]))
+  matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1])-1)
   matrice = fillMatrix(matrice, sequences1)
   print (matrice)
-  print (matrice.shape)
-  print (sequences1)
   start = startingPos(matrice)
   sequences2 = fetchSequences("reads.fq")
   path,end = sequencePath(matrice,start)
