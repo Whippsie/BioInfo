@@ -110,7 +110,7 @@ def sequencePath(matrice, pos):
   y = pos[0,1]
   path = []
   current = matrice[x][y]
-  while ((x > 0) or (y > 0)):
+  while ((x > 0) and (y > 0)):
     if (current!=0):
       if (current - MISMATCH == matrice[x-1][y-1]) or (current - MATCH == matrice[x-1][y-1]):
         x -= 1
@@ -125,20 +125,22 @@ def sequencePath(matrice, pos):
         y -= 1
         current = matrice[x][y]
         path.append([0,1])
-      else:
-        raise Exception("Score match pas avec algo")
       current = matrice[x][y]
     else:
+        break
+    """
       if x>0:
         x -= 1
         path.append([1,0])
       else:
         y -= 1
         path.append([0,1])
+    """
   return path, np.array([x,y])
 
 ### alignement des séquences selon un chemin connue
-def alignSequences(start, path, seqs):
+def alignSequences(start, path, seqs, end, size):
+  path.reverse()
   seqLength = sum(start) + len(path)
   seq1 = seqs[1].strip("\n")
   seq2 = seqs[0].strip("\n")
@@ -181,23 +183,37 @@ def alignSequences(start, path, seqs):
       y += 1
     else: seq2align = seq2align + "-"
     i +=1
-
   ### complétion de la séquence
+  #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
+  size = size[0]-1
+  #TODO: Trouver une condition moins dégueux
+  while True:
+      if end[0][0]<size:
+        seq1align += "-"
+        seq2align += seq2[end[0][0]]
+        end[0][0] += 1
+      elif end[0][1]<size :
+        seq1align += "-"
+        end[0][1]+=1
+      else:
+          break
 
   return [seq1align, seq2align]
 
 ### main
 def main():
-  #sequences1 = fetchSequences("test.txt")
-  sequences1 = ["GTAGACC","AGCGTAGA"]
+  sequences1 = fetchSequences("test.txt")
+  #sequences1 = ["GTAGACC","AGCGTAGA"]
   matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1]))
+  print (len(sequences1[0]), " ", len(sequences1[1]))
   matrice = fillMatrix(matrice, sequences1)
   print (matrice)
+  print (matrice.shape)
+  print (sequences1)
   start = startingPos(matrice)
   sequences2 = fetchSequences("reads.fq")
   path,end = sequencePath(matrice,start)
-  print (path)
-  aligned = alignSequences(end, path, sequences1)
+  aligned = alignSequences(end, path, sequences1, start, matrice.shape)
   print(aligned[0])
   print(aligned[1])
 
