@@ -51,6 +51,8 @@ def fastaSequences(filename):
 
 ### initiation de la matrice
 def sequenceMatrix(len1, len2):
+  print (len1)
+  print (len2)
   if (len1+len2)*4 > 2**32:
     matrix = np.zeros(shape=(len1+1,len2+1), dtype=np.uint64)
   elif (len1+len2)*4 > 2**16:
@@ -84,7 +86,7 @@ def matching(data1, data2):
 def starter(list):
   n = 0
   startPos = [0,0]
-  while n <= len(list):
+  while n < len(list):
     if sum(startPos) < sum(list[n]):
       startPos = list[n]
     n += 1
@@ -94,14 +96,23 @@ def starter(list):
 def startingPos(matrice):
   ### on trouve le(s) point de départ selon le choix.
   start = np.argwhere(matrice == np.amax(matrice))
+  size = matrice.shape
+  final_strt=0
   if len(start) > 1:
     if WANTEDSEQUENCES == 'last':
-      start = starter(start)
+      final_strt = starter(start)
     elif WANTEDSEQUENCES == 'first':
-      start = x.argmax(axis=0)
+      final_strt = x.argmax(axis=0)
     else:
       raise Exception("Not implemented")
-  return start
+  print ("final", final_strt)
+  if start[0][0] == size[0]-1:
+    suffixeprefix = False
+  elif start[0][1] == size[1]-1:
+    suffixeprefix = True
+  else:
+    raise Exception ("pas un suffixe prefixe ni un prefixe suffixe")
+  return (suffixeprefix,start)
 
 ### sequence pathing
 def sequencePath(matrice, pos, seq1, seq2):
@@ -126,7 +137,7 @@ def sequencePath(matrice, pos, seq1, seq2):
       else:
         break
       current = matrice[x][y]
-
+  print (path)
   return path, np.array([x,y])
 
 ### alignement des séquences selon un chemin connue
@@ -148,7 +159,6 @@ def alignSequences(start, path, seqs, end, size):
       x -= 1
       seq2align += seq2[y]
       y += 1
-
   elif start[1] > 0:
     length = len(seq1)
     x = start[1]
@@ -176,30 +186,38 @@ def alignSequences(start, path, seqs, end, size):
     i +=1
   ### complétion de la séquence
   #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
-  size = size[0]-1
+  size_int = size[0] - 1
   #TODO: Trouver une condition moins dégueux
-  while True:
-    if end[0][0]<size:
+  if end[0][0]<size_int:
+    x = end[0][0]
+    while x<size_int:
+      seq1align += "-"
+      seq2align += seq2[x]
+      x += 1
+  elif end[0][1]<size_int :
+    x = end[0][1]
+    while x<size_int:
       seq2align += "-"
-      seq1align += seq1[end[0][0]]
-      end[0][0] += 1
-    elif end[0][1]<size :
-      seq2align += "-"
-      seq1align += seq1[end[0][1]]
-      end[0][1]+=1
-    else:
-      break
+      seq1align += seq1[x]
+      x+=1
 
   return [seq1align, seq2align], i
+#derniere colonne : suffixe prefixe
 
 ### main
 def main():
-  cheval = "1"
   sequences1 = fetchSequences("test.txt")
-  matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1])-1)
+  #sequences1 = ["GTAGACC", "AGCGTAGA"]
+  #enlève le \n
+  seq2 = sequences1[1].split("\n")
+  print (seq2[0])
+  matrice = sequenceMatrix(len(sequences1[0]), len(seq2[0]))
+  sequences1[1] = seq2[0]
   matrice = fillMatrix(matrice, sequences1)
-  start = startingPos(matrice)
+  start = startingPos(matrice)[1]
+  suffixPrefix = startingPos(matrice)[0]
   score = np.amax(matrice)
+  print (matrice)
   sequences2 = fetchSequences("reads.fq")
   path,end = sequencePath(matrice,start, sequences1[0], sequences1[1])
   aligned, cheval = alignSequences(end, path, sequences1, start, matrice.shape)
