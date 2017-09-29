@@ -93,8 +93,7 @@ def starter(list):
 ### Point de départ de la séquence chevauchée
 def startingPos(matrice):
   ### on trouve le(s) point de départ selon le choix.
-  start = np.argwhere(matrice == np.amax(matrice)) ##
-  #print ("starting position ",start)
+  start = np.argwhere(matrice == np.amax(matrice))
   if len(start) > 1:
     if WANTEDSEQUENCES == 'last':
       start = starter(start)
@@ -105,18 +104,17 @@ def startingPos(matrice):
   return start
 
 ### sequence pathing
-def sequencePath(matrice, pos):
+def sequencePath(matrice, pos, seq1, seq2):
   x = pos[0,0]
   y = pos[0,1]
   path = []
   current = matrice[x][y]
   while ((x > 0) and (y > 0)):
-    if (current!=0):
-      if (current - MISMATCH == matrice[x-1][y-1]) or (current - MATCH == matrice[x-1][y-1]):
+    #if (current!=0):
+      if ((current - MISMATCH == matrice[x-1][y-1]) and (seq1[x-1] != seq2[y-1])) or ((current - MATCH == matrice[x-1][y-1]) and (seq1[x-1] == seq2[y-1])):
         x -= 1
         y -= 1
         path.append([1,1])
-        #print (matrice[x-1][y-1])
       elif (current - INDEL == matrice[x-1][y]):
         x -= 1
         current = matrice[x][y]
@@ -125,17 +123,10 @@ def sequencePath(matrice, pos):
         y -= 1
         current = matrice[x][y]
         path.append([0,1])
-      current = matrice[x][y]
-    else:
-        break
-    """
-      if x>0:
-        x -= 1
-        path.append([1,0])
       else:
-        y -= 1
-        path.append([0,1])
-    """
+        break
+      current = matrice[x][y]
+
   return path, np.array([x,y])
 
 ### alignement des séquences selon un chemin connue
@@ -153,18 +144,18 @@ def alignSequences(start, path, seqs, end, size):
     length = len(seq2)
     x = start[0]
     while x > 0:
-      seq1align = seq1align + "-"
+      seq1align += "-"
       x -= 1
-      seq2align = seq2align + seq2[y]
+      seq2align += seq2[y]
       y += 1
 
   elif start[1] > 0:
     length = len(seq1)
     x = start[1]
     while x > 0:
-      seq2align = seq2align + "-"
+      seq2align += "-"
       x -= 1
-      seq1align = seq1align + seq1[z]
+      seq1align += seq1[z]
       z += 1
   else:
     pass
@@ -173,43 +164,42 @@ def alignSequences(start, path, seqs, end, size):
   i = 0
   while i < len(path):
     if path[i][0] == 1:
-      seq1align = seq1align + seq1[z]
-      z += 1
+      seq2align += seq2[y]
+      y += 1
     else:
-      seq1align = seq1align + "-"
+      seq2align += "-"
 
     if path[i][1] == 1:
-      seq2align = seq2align + seq2[y]
-      y += 1
-    else: seq2align = seq2align + "-"
+      seq1align += seq1[z]
+      z += 1
+    else: seq1align = seq1align + "-"
     i +=1
   ### complétion de la séquence
   #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
   size = size[0]-1
   #TODO: Trouver une condition moins dégueux
   while True:
-      if end[0][0]<size:
-        seq1align += "-"
-        seq2align += seq2[end[0][0]]
-        end[0][0] += 1
-      elif end[0][1]<size :
-        seq1align += "-"
-        end[0][1]+=1
-      else:
-          break
+    if end[0][0]<size:
+      seq2align += "-"
+      seq1align += seq1[end[0][0]]
+      end[0][0] += 1
+    elif end[0][1]<size :
+      seq2align += "-"
+      seq1align += seq1[end[0][1]]
+      end[0][1]+=1
+    else:
+      break
 
   return [seq1align, seq2align]
 
 ### main
 def main():
   sequences1 = fetchSequences("test.txt")
-  #sequences1 = ["GTAGACC","AGCGTAGA"]
   matrice = sequenceMatrix(len(sequences1[0]), len(sequences1[1])-1)
   matrice = fillMatrix(matrice, sequences1)
-  print (matrice)
   start = startingPos(matrice)
   sequences2 = fetchSequences("reads.fq")
-  path,end = sequencePath(matrice,start)
+  path,end = sequencePath(matrice,start, sequences1[0], sequences1[1])
   aligned = alignSequences(end, path, sequences1, start, matrice.shape)
   print(aligned[0])
   print(aligned[1])

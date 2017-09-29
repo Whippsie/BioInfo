@@ -1,0 +1,79 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+\documentclass[11pt, letterpaper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[french]{babel}
+\usepackage{lmodern}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amsfonts,amsthm,amssymb}
+\usepackage{graphicx}
+\usepackage{textcomp}
+
+% Dimensions
+\usepackage[top=2cm, bottom=2cm, left=1.8cm, right=1.8cm, columnsep=20pt]{geometry}
+
+% graphiques
+\usepackage{graphicx}
+
+% PACKAGES
+\usepackage{karnaugh-map}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tikz}
+\usepackage{slashbox}
+\usetikzlibrary{automata,positioning}
+\begin{document}
+
+\begin{titlepage}
+\center
+
+\vspace*{2cm}
+
+\textsc{\LARGE Université de Montréal}\\[1cm] 
+\textsc{\Large IFT 3295 -- Bio-Informatique}\\[1.5cm] 
+
+\rule{\linewidth}{0.5mm} \\[0.5cm]
+{\LARGE \bfseries Devoir 1} \\[0.2cm] % ***éditez ceci***
+\rule{\linewidth}{0.5mm} \\[3cm]
+ 
+\large par: \\*
+André Lalonde \\* % ***éditez ceci***
+(20024885) \\*[1cm] % ***éditez ceci***
+Maude Qqc \\*
+(xxxxxxxx) \\*[6cm]
+{\large \today}\\[2cm]
+
+\vfill
+\end{titlepage}
+\newpage
+\flushleft
+\par{
+\textbf{Chevauchement de séquences} \\*[1cm]
+\quad 1. Quelle est la différence entre un tel alignement et l'alignement global? \\*[5mm]
+\textbf{\underline{Réponse}:} Un tel alignement recherche le meilleur match au travers d'une séquence sans obligatoirement devoir prendre l'alignement au complet. Il peut avoir un préfixe et/ou un suffixe qui ne fait pas partie de l'alignement. \\*[5mm]
+\quad 2. Quelles doivent être les valeurs de la première ligne $(V(0,j) \ \forall j)$? et celles de la première colonne $(V(i,0) \ \forall i)$ de la table de programmation dynamique $V$? \\*[5mm]
+\textbf{\underline{Réponse}:} Puisque l'alignement permet d'avoir un préfixe et/ou un suffixe, la première rangée ainsi que la première colonne ne contient que des 0. Étant donné que l'on a pas de restriction tant qu'au nombre de caractères qui doivent être matcher dans la séquence, on ne pénalise pas un "décalage initiale" puisque l'on peu démarrer de n'importe quel paire de séquence. \\*[5mm]
+\quad 3. Quelles sont les équations de récurrence à utiliser pour remplir la table de programmation dynamique? \\*[5mm]
+\textbf{\underline{Réponse}:} Les équations sont \\*[3mm]
+\center
+\begin{equation}
+	max \begin{cases}
+	0 \\
+	V(i-1,j-1) + : \begin{cases}
+									+4 \ si \ v_i = w_j \\
+									-4 \ si \ v_i \neq w_j
+									\end{cases} \\
+	V(i-1,j) - 8 \\
+	V(i,j-1) - 8
+	\end{cases}
+\end{equation} \\*[5mm]
+\flushleft
+\quad 4. Comment peut-on retrouver l'alignement avec le meilleur chevauchement à partir de la table de programmation dynamique? \\*[5mm]
+\textbf{\underline{Réponse}:} Premièrement, on cherche dans le tableau la plus grande valeur, qui sera la case de départ. Par la suite, on prend la plus grande valeur entre la case du haut, celle de gauche, et celle en haut à gauche. Lorsque l'on se déplace dans la direction $\nwarrow$, les deux caractères sont un "match" et on écrit donc les deux caractères de la case $V(i,j)$. Lorsque l'on se déplace dans la direction $\uparrow$, alors on "match" le caractère de la ligne $i$ avec un indel. De façon similaire, lorsque l'on se déplace vers $\leftarrow$, alors on "match" le caractère de la ligne $j$ avec un indel. Lorsque l'on arrive sur une case qui vaut 0, on arrête la procédure. \\*[5mm]
+\quad 5. Voir le fichier question1.py \\
+\newpage
+\textbf{Assemblage de fragments} \\*[1cm]
+\quad 1. Pour chaque paire de reads $\{R_x, R_y \}$, calculer le score de l'alignement correspondant au chevauchement maximal entre $R_x$ et $R_y$. %matrice 20x20 diagonal = 0
+\end{document}
