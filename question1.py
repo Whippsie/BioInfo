@@ -51,8 +51,6 @@ def fastaSequences(filename):
 
 ### initiation de la matrice
 def sequenceMatrix(len1, len2):
-  print (len1)
-  print (len2)
   if (len1+len2)*4 > 2**32:
     matrix = np.zeros(shape=(len1+1,len2+1), dtype=np.uint64)
   elif (len1+len2)*4 > 2**16:
@@ -105,7 +103,6 @@ def startingPos(matrice):
       final_strt = x.argmax(axis=0)
     else:
       raise Exception("Not implemented")
-  print ("final", final_strt)
   if start[0][0] == size[0]-1:
     suffixeprefix = False
   elif start[0][1] == size[1]-1:
@@ -206,11 +203,11 @@ def alignSequences(start, path, seqs, end, size):
 
 ### main
 def main():
+  cheval = '1'
   sequences1 = fetchSequences("test.txt")
   #sequences1 = ["GTAGACC", "AGCGTAGA"]
   #enlève le \n
   seq2 = sequences1[1].split("\n")
-  print (seq2[0])
   matrice = sequenceMatrix(len(sequences1[0]), len(seq2[0]))
   sequences1[1] = seq2[0]
   matrice = fillMatrix(matrice, sequences1)
