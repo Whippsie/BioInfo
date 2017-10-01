@@ -141,7 +141,7 @@ def genIndelStart(start, seq1, seq2, ):
       x -= 1
       seq2align += seq2[y]
       y += 1
-  elif start[1] > 0:
+  if start[1] > 0:
     x = start[1]
     while x > 0:
       seq2align += "-"
@@ -287,11 +287,12 @@ def main():
       else:
           break
 
-  #sequences3 = fetchSequences("test.txt")
-  #sequences4 = fetchSequences("test2.txt")
-  #sequences5 = fetchSequences("test3.txt")
+  sequences3 = fetchSequences("test.txt")
+  sequences4 = fetchSequences("test2.txt")
+  sequences5 = fetchSequences("test3.txt")
   sequences6 = fetchSequences("test5.txt")
   #sequences7 = ["GTAGACC", "AGCGTAGA"]
+  sequences6 = stripSeq(sequences6)
   genMatrixAlignement(sequences6[0],sequences6[1],True)
 
   return None
