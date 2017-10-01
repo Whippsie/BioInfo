@@ -199,31 +199,32 @@ def genIndelEnd(s1,s2,end,size,sq1,sq2):
 def genMatrix2020(sequences):
     # SCORE : M[RX,RY] SI RX SUFFIXE, RY PREFIXE
     #TODO:Remove hardcoded
-  matrix= sequenceMatrix(20,20)
-  for i in range (len(sequences)-1):
-      for j in range (len(sequences)-1):
+  matrix = np.zeros(shape=(20, 20))
+  for i in range (len(sequences)):
+      for j in range (len(sequences)):
         #On ne calcule pas la diagonale
         if not(i==j):
-            #On calcule le meilleur alignement de la colonne et de la ligne (Rx,Ry) et (Ry,Rx)
-            bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], False)
-            #TODO: iNVERSE? Pas sure si bestLigne en premier
-            matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
-            matrix[j][i] = bestLigne #Rx prefixe, Ry suffixe
-            print ("Seq ",i, " avec Seq ", j, "| Score:", bestCol, "|  Inverse: ", bestLigne)
-  #print (matrix)
+            if (i<j):
+                #On calcule le meilleur alignement de la colonne et de la ligne (Rx,Ry) et (Ry,Rx)
+                bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], False)
+                #TODO: iNVERSE? Pas sure si bestLigne en premier
+                matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
+                matrix[j][i] = bestLigne #Rx prefixe, Ry suffixe
+                print ("Seq ",i, " avec Seq ", j, "| Score:", bestCol, "|  Inverse: ", bestLigne)
+  print (matrix)
 
 
 def genMatrixAlignement(seq1, seq2, show):
   alignValue = '1'
   matrice = sequenceMatrix(len(seq1), len(seq2))
   matrice = fillMatrix(matrice, seq1, seq2)
-  print (matrice)
 
   # Trouve le score et la position totale, en plus de la valeur maximale de la ligne et colonne
   maxLigne, maxCol, score, posFinal = findMax(matrice)
 
   if show:
       #On affiche que le chevauchement optimal
+      print (matrice)
       path, end = sequencePath(matrice, posFinal, seq1, seq2)
       aligned, alignValue = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
       print("Sequence 1: " + aligned[0])
