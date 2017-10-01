@@ -163,9 +163,8 @@ def alignSequences(start, path, seq1, seq2, end, size):
     else: seq1align = seq1align + "-"
     i +=1
   ### complétion de la séquence
-  #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
   size_ligne = size[0] - 1
-  size_col = size[1] -1
+  size_col = size[1] - 1
   if end[0]<size_ligne:
     x = end[0]
     while x<size_ligne:
@@ -180,14 +179,13 @@ def alignSequences(start, path, seq1, seq2, end, size):
       x+=1
 
   return [seq1align, seq2align], i
-#derniere colonne : suffixe prefixe
+
 
 def genIndelStart(start, seq1, seq2, ):
   y = 0
   z = 0
   seq1align = ""
   seq2align = ""
-
   ### initialisation des indels pour le préfixe
   if start[0] > 0:
     length = len(seq2)
@@ -207,18 +205,27 @@ def genIndelStart(start, seq1, seq2, ):
       z += 1
   else:
     pass
-
   return seq1align,seq2align,x,y,z
 
-def matrice2020(sequences):
+def genMatrix2020(sequences):
+    # SCORE : M[RX,RY] SI RX SUFFIXE, RY PREFIXE
+    #TODO:Remove hardcoded
+  matrix= sequenceMatrix(20,20)
   for i in range (len(sequences)-1):
-    bestscore = matricechevauchement2seq(sequences[i], sequences[i+1])
+      for j in range (len(sequences)-1):
+        if not(i==j):
+            bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], False)
+            #TODO: iNVERSE?
+            matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
+            matrix[j][i] = bestLigne #Rx prefixe, Ry suffixe
+            print ("Seq ",i, " avec Seq ", j, "| Score:", bestCol, "|  Inverse: ", bestLigne)
+  print (matrix)
 
-def matricechevauchement2seq(seq1, seq2):
+
+def genMatrixAlignement(seq1, seq2, show):
   cheval = '1'
   matrice = sequenceMatrix(len(seq1), len(seq2))
   matrice = fillMatrix(matrice, seq1, seq2)
-  print (matrice)
   shape = matrice.shape
   maxLigne = 0
   maxCol = 0
@@ -244,13 +251,14 @@ def matricechevauchement2seq(seq1, seq2):
     score = maxCol
     posFinal = posCol
   #start = startingPos(matrice)[1]
-  path, end = sequencePath(matrice, posFinal, seq1, seq2)
-  aligned, cheval = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
-  print("Sequence 1: " + aligned[0])
-  print("Sequence 2: " + aligned[1])
-  print("Chevauchement: " + str(cheval))
-  print("Score: " + str(score))
-  return score
+  if show:
+      path, end = sequencePath(matrice, posFinal, seq1, seq2)
+      aligned, cheval = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
+      print("Sequence 1: " + aligned[0])
+      print("Sequence 2: " + aligned[1])
+      print("Chevauchement: " + str(cheval))
+      print("Score: " + str(score))
+  return maxLigne, maxCol
 
 def stripSeq(seqList):
   for i in range (len(seqList)):
@@ -261,12 +269,15 @@ def stripSeq(seqList):
 def main():
   sequences1 = fetchSequences("test2.txt")
   sequences2 = fetchSequences("reads.fq")
+  sequences3 = fetchSequences("test.txt")
+  sequences4 = fetchSequences("test3.txt")
+  sequences5 = fetchSequences("test4.txt")
   #sequences2 = ["GTAGACC", "AGCGTAGA"]
 
   sequences1 = stripSeq(sequences1)
   sequences2 = stripSeq(sequences2)
-  #score = matricechevauchement2seq(seq1,seq2)
-  matrice2020 (sequences1)
+  #score = genMatrixAlignement(seq1,seq2, True)
+  genMatrix2020 (sequences2)
 
   return None
 
