@@ -12,6 +12,7 @@
 ########################
 import os
 import numpy as np
+np.set_printoptions(threshold=np.nan)
 ########################
 ### valeur des scores
 ########################
@@ -80,37 +81,6 @@ def matching(data1, data2):
   else:
     return MISMATCH
 
-### Case de la meilleure séquence si plusieurs résultats sont disponibles
-def starter(list):
-  n = 0
-  startPos = [0,0]
-  while n < len(list):
-    if sum(startPos) < sum(list[n]):
-      startPos = list[n]
-    n += 1
-  return startPos
-
-### Point de départ de la séquence chevauchée
-def startingPos(matrice):
-  ### on trouve le(s) point de départ selon le choix.
-  start = np.argwhere(matrice == np.amax(matrice))
-  size = matrice.shape
-  final_strt=0
-  if len(start) > 1:
-    if WANTEDSEQUENCES == 'last':
-      final_strt = starter(start)
-    elif WANTEDSEQUENCES == 'first':
-      final_strt = x.argmax(axis=0)
-    else:
-      raise Exception("Not implemented")
-  if start[0][0] == size[0]-1:
-    suffixeprefix = False
-  elif start[0][1] == size[1]-1:
-    suffixeprefix = True
-  else:
-    raise Exception ("pas un suffixe prefixe ni un prefixe suffixe")
-  return (suffixeprefix,start)
-
 ### sequence pathing
 def sequencePath(matrice, pos, seq1, seq2):
   x = pos[0]
@@ -138,48 +108,23 @@ def sequencePath(matrice, pos, seq1, seq2):
 
 ### alignement des séquences selon un chemin connue
 def alignSequences(start, path, seq1, seq2, end, size):
-  path.reverse()
-  seqLength = sum(start) + len(path)
 
+  path.reverse()
   temp = seq2
   seq2 = seq1
   seq1 = temp
 
-
+  #Création de fonctions pour séparer les étapes
+  """Indels de départ"""
   seq1align,seq2align,x,y,z = genIndelStart(start,seq1,seq2)
 
-  ### ajout des séquences de chemin
-  i = 0
-  while i < len(path):
-    if path[i][0] == 1:
-      seq2align += seq2[y]
-      y += 1
-    else:
-      seq2align += "-"
+  """Séquences de chemin"""
+  seq1align,seq2align,y,z,i = genSeqPath(seq1align,seq2align,path,y,z,seq1,seq2)
 
-    if path[i][1] == 1:
-      seq1align += seq1[z]
-      z += 1
-    else: seq1align = seq1align + "-"
-    i +=1
-  ### complétion de la séquence
-  size_ligne = size[0] - 1
-  size_col = size[1] - 1
-  if end[0]<size_ligne:
-    x = end[0]
-    while x<size_ligne:
-      seq1align += "-"
-      seq2align += seq2[x]
-      x += 1
-  elif end[1]<size_col :
-    x = end[1]
-    while x<size_col:
-      seq2align += "-"
-      seq1align += seq1[x]
-      x+=1
+  """Complétion de la séquence"""
+  seq1align,seq2align= genIndelEnd(seq1align,seq2align,end,size,seq1,seq2)
 
   return [seq1align, seq2align], i
-
 
 def genIndelStart(start, seq1, seq2, ):
   y = 0
@@ -187,8 +132,9 @@ def genIndelStart(start, seq1, seq2, ):
   seq1align = ""
   seq2align = ""
   ### initialisation des indels pour le préfixe
+
+  #IMPORTANT : L'erreur est ici! Les indels doivent être dans AGTCA.. et non dans GGGGTT
   if start[0] > 0:
-    length = len(seq2)
     x = start[0]
     while x > 0:
       seq1align += "-"
@@ -196,7 +142,6 @@ def genIndelStart(start, seq1, seq2, ):
       seq2align += seq2[y]
       y += 1
   elif start[1] > 0:
-    length = len(seq1)
     x = start[1]
     while x > 0:
       seq2align += "-"
@@ -207,15 +152,61 @@ def genIndelStart(start, seq1, seq2, ):
     pass
   return seq1align,seq2align,x,y,z
 
+#s1=seqalign1,s2=seqalign2,sq1=seq1,sq2=seq2
+def genSeqPath(s1,s2,p,y,z,sq1,sq2):
+  i = 0
+  while i < len(p):
+    if p[i][0] == 1:
+      s2 += sq2[y]
+      y += 1
+    else:
+      s2 += "-"
+
+    if p[i][1] == 1:
+      s1 += sq1[z]
+      z += 1
+    else:
+      s1 += "-"
+    i += 1
+
+  return s1,s2,y,z,i
+
+#s1=seqalign1,s2=seqalign2,sq1=seq1,sq2=seq2
+def genIndelEnd(s1,s2,end,size,sq1,sq2):
+  size_ligne = size[0] - 1
+  size_col = size[1] - 1
+
+  if end[0] < size_ligne:
+    x = end[0]
+    while x < size_ligne:
+      s1 += "-"
+      s2 += sq2[x]
+      x += 1
+  elif end[1] < size_col:
+    x = end[1]
+    while x < size_col:
+      s2 += "-"
+      s1 += sq1[x]
+      x += 1
+
+  return s1,s2
+
+
+
+
+
+"""Génère la matrice 20 par 20 des séquences reads"""
 def genMatrix2020(sequences):
     # SCORE : M[RX,RY] SI RX SUFFIXE, RY PREFIXE
     #TODO:Remove hardcoded
   matrix= sequenceMatrix(20,20)
   for i in range (len(sequences)-1):
       for j in range (len(sequences)-1):
+        #On ne calcule pas la diagonale
         if not(i==j):
+            #On calcule le meilleur alignement de la colonne et de la ligne (Rx,Ry) et (Ry,Rx)
             bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], False)
-            #TODO: iNVERSE?
+            #TODO: iNVERSE? Pas sure si bestLigne en premier
             matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
             matrix[j][i] = bestLigne #Rx prefixe, Ry suffixe
             print ("Seq ",i, " avec Seq ", j, "| Score:", bestCol, "|  Inverse: ", bestLigne)
@@ -223,44 +214,56 @@ def genMatrix2020(sequences):
 
 
 def genMatrixAlignement(seq1, seq2, show):
-  cheval = '1'
+  alignValue = '1'
   matrice = sequenceMatrix(len(seq1), len(seq2))
   matrice = fillMatrix(matrice, seq1, seq2)
   print (matrice)
-  shape = matrice.shape
-  maxLigne = 0
-  maxCol = 0
-  posLigne = (0,0)
-  posCol = (0,0)
-  indexLigne = shape[0]-1
-  indexCol = shape[1]-1
-  for i in range (indexCol+1):
-    if matrice[indexLigne][i]>maxLigne:
-      maxLigne = matrice[indexLigne][i]
-      posLigne = (indexLigne,i)
-  for i in range (indexLigne+1):
-    if matrice[i][indexCol]>maxCol:
-      maxCol = matrice[i][indexCol]
-      posCol = (i,indexCol)
 
-  posFinal = (0,0)
-  #tag=0 derniere ligne, tag=1 derniere colonne
-  if (maxLigne>maxCol):
+  # Trouve le score et la position totale, en plus de la valeur maximale de la ligne et colonne
+  maxLigne, maxCol, score, posFinal = findMax(matrice)
+
+  if show:
+      #On affiche que le chevauchement optimal
+      path, end = sequencePath(matrice, posFinal, seq1, seq2)
+      aligned, alignValue = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
+      print("Sequence 1: " + aligned[0])
+      print("Sequence 2: " + aligned[1])
+      print("Chevauchement: " + str(alignValue))
+      print("Score: " + str(score))
+
+  #Retourne le max ligne colonne pour la matrice 20x20
+  return maxLigne, maxCol
+
+def findMax(matrice):
+  shape = matrice.shape
+  maxLigne,maxCol = 0,0
+  posLigne, posCol, posFinal = (0, 0),(0,0),(0,0)
+  #Shape a une valeur en trop
+  indexLigne = shape[0] - 1
+  indexCol = shape[1] - 1
+
+  # Parcourt les colonnes de la dernière ligne et cherche la plus haute valeur
+  for i in range(indexCol + 1):
+    if matrice[indexLigne][i] > maxLigne:
+      maxLigne = matrice[indexLigne][i]
+      posLigne = (indexLigne, i)
+
+  # Parcourt les lignes de la dernière col et cherche la plus haute valeur
+  for i in range(indexLigne + 1):
+    if matrice[i][indexCol] > maxCol:
+      maxCol = matrice[i][indexCol]
+      posCol = (i, indexCol)
+
+  # Compare les scores pour obtenir le plus élevé
+  if (maxLigne > maxCol):
     score = maxLigne
     posFinal = posLigne
   else:
     score = maxCol
     posFinal = posCol
-  #start = startingPos(matrice)[1]
-  if show:
-      path, end = sequencePath(matrice, posFinal, seq1, seq2)
-      aligned, cheval = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
-      print("Sequence 1: " + aligned[0])
-      print("Sequence 2: " + aligned[1])
-      print("Chevauchement: " + str(cheval))
-      print("Score: " + str(score))
-  return maxLigne, maxCol
+  return maxLigne, maxCol, score, posFinal
 
+#Supprime les espacements des séquences
 def stripSeq(seqList):
   for i in range (len(seqList)):
     seqList[i] = seqList[i].strip("\n")
@@ -269,7 +272,8 @@ def stripSeq(seqList):
 ### main
 def main():
   while True:
-      res = input("1 pour comparer deux séquences, 2 pour voir la matrice d'adjacence 20x20, autre pour quitter \n")
+    #!IMPORTANT: Pour tester le bug, faire 3
+      res = input("1 pour comparer deux séquences, 2 pour voir la matrice d'adjacence 20x20, 3 POUR VOIR LE BUG \n")
       if res == "1":
           file = input("Veuillez entrer le nom du fichier avec son extension (ex: test.txt) \n")
           sequences1 = fetchSequences(file)
@@ -278,6 +282,7 @@ def main():
       elif res == "2":
           sequences2 = fetchSequences("reads.fq")
           sequences2 = stripSeq(sequences2)
+          genMatrix2020(sequences2)
       else:
           break
 
@@ -286,8 +291,7 @@ def main():
   #sequences5 = fetchSequences("test3.txt")
   sequences6 = fetchSequences("test5.txt")
   #sequences7 = ["GTAGACC", "AGCGTAGA"]
-
-  genMatrix2020 (sequences6)
+  genMatrixAlignement(sequences6[0],sequences6[1],True)
 
   return None
 
