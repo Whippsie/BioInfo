@@ -221,10 +221,9 @@ def genMatrixAlignement(seq1, seq2, show):
 
   # Trouve le score et la position totale, en plus de la valeur maximale de la ligne et colonne
   maxLigne, maxCol, score, posFinal = findMax(matrice)
-
   if show:
       #On affiche que le chevauchement optimal
-      print (matrice)
+      #print (matrice)
       path, end = sequencePath(matrice, posFinal, seq1, seq2)
       aligned, alignValue = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
       print("Sequence 1: " + aligned[0])
@@ -291,9 +290,10 @@ def main():
   sequences4 = fetchSequences("test2.txt")
   sequences5 = fetchSequences("test3.txt")
   sequences6 = fetchSequences("test5.txt")
-  #sequences7 = ["GTAGACC", "AGCGTAGA"]
-  sequences6 = stripSeq(sequences6)
+  sequences7 = ["GTAGACC", "AGCGTAGA"]
+  sequences6 = stripSeq(sequences7)
   genMatrixAlignement(sequences6[0],sequences6[1],True)
+
 
   return None
 
