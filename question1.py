@@ -219,13 +219,14 @@ def genMatrix2020(sequences):
             matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
             matrix[j][i] = bestLigne #Rx prefixe, Ry suffixe
             print ("Seq ",i, " avec Seq ", j, "| Score:", bestCol, "|  Inverse: ", bestLigne)
-  print (matrix)
+  #print (matrix)
 
 
 def genMatrixAlignement(seq1, seq2, show):
   cheval = '1'
   matrice = sequenceMatrix(len(seq1), len(seq2))
   matrice = fillMatrix(matrice, seq1, seq2)
+  print (matrice)
   shape = matrice.shape
   maxLigne = 0
   maxCol = 0
@@ -267,17 +268,26 @@ def stripSeq(seqList):
 
 ### main
 def main():
-  sequences1 = fetchSequences("test2.txt")
-  sequences2 = fetchSequences("reads.fq")
-  sequences3 = fetchSequences("test.txt")
-  sequences4 = fetchSequences("test3.txt")
-  sequences5 = fetchSequences("test4.txt")
-  #sequences2 = ["GTAGACC", "AGCGTAGA"]
+  while True:
+      res = input("1 pour comparer deux séquences, 2 pour voir la matrice d'adjacence 20x20, autre pour quitter \n")
+      if res == "1":
+          file = input("Veuillez entrer le nom du fichier avec son extension (ex: test.txt) \n")
+          sequences1 = fetchSequences(file)
+          sequences1 = stripSeq(sequences1)
+          genMatrixAlignement(sequences1[0], sequences1[1], True)
+      elif res == "2":
+          sequences2 = fetchSequences("reads.fq")
+          sequences2 = stripSeq(sequences2)
+      else:
+          break
 
-  sequences1 = stripSeq(sequences1)
-  sequences2 = stripSeq(sequences2)
-  #score = genMatrixAlignement(seq1,seq2, True)
-  genMatrix2020 (sequences2)
+  #sequences3 = fetchSequences("test.txt")
+  #sequences4 = fetchSequences("test2.txt")
+  #sequences5 = fetchSequences("test3.txt")
+  sequences6 = fetchSequences("test5.txt")
+  #sequences7 = ["GTAGACC", "AGCGTAGA"]
+
+  genMatrix2020 (sequences6)
 
   return None
 
