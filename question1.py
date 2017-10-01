@@ -62,14 +62,14 @@ def sequenceMatrix(len1, len2):
   return matrix
 
 ### remplissage du tableau
-def fillMatrix(matrix, sequences):
+def fillMatrix(matrix, seq1, seq2):
   ### Ici on laisse la première ligne et la première  #
   #   colonne remplis avec des zéros et on applique   #
   #   l'algorithme de remplissage de score.           #
   #   Match = +4, Mismatch = -4, Indel = -8         ###
   for i in range(1,len(matrix)):
     for j in range(1,matrix[i].size):
-      match = matching(sequences[0][i-1],sequences[1][j-1])
+      match = matching(seq1[i-1],seq2[j-1])
       matrix[i][j] = max(0, matrix[i-1][j-1]+match, matrix[i][j-1]+INDEL, matrix[i-1][j]+INDEL)
   return matrix
 
@@ -113,8 +113,8 @@ def startingPos(matrice):
 
 ### sequence pathing
 def sequencePath(matrice, pos, seq1, seq2):
-  x = pos[0,0]
-  y = pos[0,1]
+  x = pos[0]
+  y = pos[1]
   path = []
   current = matrice[x][y]
   while ((x > 0) and (y > 0)):
@@ -134,19 +134,59 @@ def sequencePath(matrice, pos, seq1, seq2):
       else:
         break
       current = matrice[x][y]
-  print (path)
   return path, np.array([x,y])
 
 ### alignement des séquences selon un chemin connue
-def alignSequences(start, path, seqs, end, size):
+def alignSequences(start, path, seq1, seq2, end, size):
   path.reverse()
   seqLength = sum(start) + len(path)
-  seq1 = seqs[1].strip("\n")
-  seq2 = seqs[0].strip("\n")
-  seq1align = ""
-  seq2align = ""
+
+  temp = seq2
+  seq2 = seq1
+  seq1 = temp
+
+
+  seq1align,seq2align,x,y,z = genIndelStart(start,seq1,seq2)
+
+  ### ajout des séquences de chemin
+  i = 0
+  while i < len(path):
+    if path[i][0] == 1:
+      seq2align += seq2[y]
+      y += 1
+    else:
+      seq2align += "-"
+
+    if path[i][1] == 1:
+      seq1align += seq1[z]
+      z += 1
+    else: seq1align = seq1align + "-"
+    i +=1
+  ### complétion de la séquence
+  #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
+  size_int = size[0] - 1
+  if end[0]<size_int:
+    x = end[0]
+    while x<size_int:
+      seq1align += "-"
+      seq2align += seq2[x]
+      x += 1
+  elif end[1]<size_int :
+    x = end[1]
+    while x<size_int:
+      seq2align += "-"
+      seq1align += seq1[x]
+      x+=1
+
+  return [seq1align, seq2align], i
+#derniere colonne : suffixe prefixe
+
+def genIndelStart(start, seq1, seq2, ):
   y = 0
   z = 0
+  seq1align = ""
+  seq2align = ""
+
   ### initialisation des indels pour le préfixe
   if start[0] > 0:
     length = len(seq2)
@@ -167,60 +207,62 @@ def alignSequences(start, path, seqs, end, size):
   else:
     pass
 
-  ### ajout des séquences de chemin
-  i = 0
-  while i < len(path):
-    if path[i][0] == 1:
-      seq2align += seq2[y]
-      y += 1
-    else:
-      seq2align += "-"
+  return seq1align,seq2align,x,y,z
 
-    if path[i][1] == 1:
-      seq1align += seq1[z]
-      z += 1
-    else: seq1align = seq1align + "-"
-    i +=1
-  ### complétion de la séquence
-  #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
-  size_int = size[0] - 1
-  if end[0][0]<size_int:
-    x = end[0][0]
-    while x<size_int:
-      seq1align += "-"
-      seq2align += seq2[x]
-      x += 1
-  elif end[0][1]<size_int :
-    x = end[0][1]
-    while x<size_int:
-      seq2align += "-"
-      seq1align += seq1[x]
-      x+=1
+def matrice2020(sequences):
+  for i in range (len(sequences)-1):
+    print("Score chevauchement ", sequences[i], " avec la ", sequences [i+1])
+    bestscore = matricechevauchement2seq(sequences[i], sequences[i+1])
 
-  return [seq1align, seq2align], i
-#derniere colonne : suffixe prefixe
-
-### main
-def main():
+def matricechevauchement2seq(seq1, seq2):
   cheval = '1'
-  sequences1 = fetchSequences("test.txt")
-  #sequences1 = ["GTAGACC", "AGCGTAGA"]
-  #enlève le \n
-  seq2 = sequences1[1].split("\n")
-  matrice = sequenceMatrix(len(sequences1[0]), len(seq2[0]))
-  sequences1[1] = seq2[0]
-  matrice = fillMatrix(matrice, sequences1)
-  start = startingPos(matrice)[1]
-  suffixPrefix = startingPos(matrice)[0]
-  score = np.amax(matrice)
-  print (matrice)
-  sequences2 = fetchSequences("reads.fq")
-  path,end = sequencePath(matrice,start, sequences1[0], sequences1[1])
-  aligned, cheval = alignSequences(end, path, sequences1, start, matrice.shape)
+  matrice = sequenceMatrix(len(seq1), len(seq2))
+  matrice = fillMatrix(matrice, seq1, seq2)
+  shape = matrice.shape
+  maxLigne = 0
+  maxCol = 0
+  posi = (0,0)
+  indexLigne = shape[0]-1
+  indexCol = shape[1]-1
+  for i in range (indexLigne+1):
+    if matrice[i][indexLigne]>maxLigne:
+      maxLigne = matrice[i][indexLigne]
+      posi = (i,indexLigne)
+    if matrice[indexCol][i]>maxCol:
+      maxCol = matrice[indexCol][i]
+      posi = (indexCol,i)
+
+
+  #tag=0 derniere ligne, tag=1 derniere colonne
+  score = max(maxLigne, maxCol)
+  print (score)
+  #start = startingPos(matrice)[1]
+  start = posi
+  print (start)
+  path, end = sequencePath(matrice, start, seq1, seq2)
+  aligned, cheval = alignSequences(end, path, seq1, seq2, start, matrice.shape)
   print("Sequence 1: " + aligned[0])
   print("Sequence 2: " + aligned[1])
   print("Chevauchement: " + str(cheval))
   print("Score: " + str(score))
+  return score
+
+def stripSeq(seqList):
+  for i in range (len(seqList)):
+    seqList[i] = seqList[i].strip("\n")
+  return seqList
+
+### main
+def main():
+  sequences1 = fetchSequences("test.txt")
+  sequences2 = fetchSequences("reads.fq")
+  #sequences2 = ["GTAGACC", "AGCGTAGA"]
+
+  sequences1 = stripSeq(sequences1)
+  sequences2 = stripSeq(sequences2)
+  #score = matricechevauchement2seq(seq1,seq2)
+  matrice2020 (sequences2)
+
   return None
 
 
