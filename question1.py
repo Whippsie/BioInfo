@@ -164,16 +164,17 @@ def alignSequences(start, path, seq1, seq2, end, size):
     i +=1
   ### complétion de la séquence
   #TODO: On gère le cas PRÉFIXE/SUFFIXE mais doit modifier la size si SUFFIZE/PREFIXE car matrice non symétrique
-  size_int = size[0] - 1
-  if end[0]<size_int:
+  size_ligne = size[0] - 1
+  size_col = size[1] -1
+  if end[0]<size_ligne:
     x = end[0]
-    while x<size_int:
+    while x<size_ligne:
       seq1align += "-"
       seq2align += seq2[x]
       x += 1
-  elif end[1]<size_int :
+  elif end[1]<size_col :
     x = end[1]
-    while x<size_int:
+    while x<size_col:
       seq2align += "-"
       seq1align += seq1[x]
       x+=1
@@ -211,36 +212,40 @@ def genIndelStart(start, seq1, seq2, ):
 
 def matrice2020(sequences):
   for i in range (len(sequences)-1):
-    print("Score chevauchement ", sequences[i], " avec la ", sequences [i+1])
     bestscore = matricechevauchement2seq(sequences[i], sequences[i+1])
 
 def matricechevauchement2seq(seq1, seq2):
   cheval = '1'
   matrice = sequenceMatrix(len(seq1), len(seq2))
   matrice = fillMatrix(matrice, seq1, seq2)
+  print (matrice)
   shape = matrice.shape
   maxLigne = 0
   maxCol = 0
-  posi = (0,0)
+  posLigne = (0,0)
+  posCol = (0,0)
   indexLigne = shape[0]-1
   indexCol = shape[1]-1
+  for i in range (indexCol+1):
+    if matrice[indexLigne][i]>maxLigne:
+      maxLigne = matrice[indexLigne][i]
+      posLigne = (indexLigne,i)
   for i in range (indexLigne+1):
-    if matrice[i][indexLigne]>maxLigne:
-      maxLigne = matrice[i][indexLigne]
-      posi = (i,indexLigne)
-    if matrice[indexCol][i]>maxCol:
-      maxCol = matrice[indexCol][i]
-      posi = (indexCol,i)
+    if matrice[i][indexCol]>maxCol:
+      maxCol = matrice[i][indexCol]
+      posCol = (i,indexCol)
 
-
+  posFinal = (0,0)
   #tag=0 derniere ligne, tag=1 derniere colonne
-  score = max(maxLigne, maxCol)
-  print (score)
+  if (maxLigne>maxCol):
+    score = maxLigne
+    posFinal = posLigne
+  else:
+    score = maxCol
+    posFinal = posCol
   #start = startingPos(matrice)[1]
-  start = posi
-  print (start)
-  path, end = sequencePath(matrice, start, seq1, seq2)
-  aligned, cheval = alignSequences(end, path, seq1, seq2, start, matrice.shape)
+  path, end = sequencePath(matrice, posFinal, seq1, seq2)
+  aligned, cheval = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
   print("Sequence 1: " + aligned[0])
   print("Sequence 2: " + aligned[1])
   print("Chevauchement: " + str(cheval))
@@ -254,14 +259,14 @@ def stripSeq(seqList):
 
 ### main
 def main():
-  sequences1 = fetchSequences("test.txt")
+  sequences1 = fetchSequences("test2.txt")
   sequences2 = fetchSequences("reads.fq")
   #sequences2 = ["GTAGACC", "AGCGTAGA"]
 
   sequences1 = stripSeq(sequences1)
   sequences2 = stripSeq(sequences2)
   #score = matricechevauchement2seq(seq1,seq2)
-  matrice2020 (sequences2)
+  matrice2020 (sequences1)
 
   return None
 
