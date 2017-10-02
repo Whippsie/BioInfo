@@ -207,7 +207,7 @@ def genMatrix2020(sequences,seuil):
         if not(i==j):
             if (i<j):
                 #On calcule le meilleur alignement de la colonne et de la ligne (Rx,Ry) et (Ry,Rx)
-                bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], True)
+                bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], False)
                 #TODO: iNVERSE? Pas sure si bestLigne en premier
                 if bestCol>bestLigne and bestCol>=seuil:
                   matrix[i][j]=bestCol
@@ -329,29 +329,19 @@ def main():
           sequences2 = stripSeq(sequences2)
 
           #Sequences tagged as reverse:9,14,17,11,8,6,5
-          i =0
-          for ele in sequences2:
-              i+=1
-              print (i,". ",ele)
-
-          sequences2[4] = reverseSeq(sequences2[4])
           sequences2[5] = reverseSeq(sequences2[5])
-          sequences2[7] = reverseSeq(sequences2[7])
+          sequences2[6] = reverseSeq(sequences2[6])
           sequences2[8] = reverseSeq(sequences2[8])
-          sequences2[10] = reverseSeq(sequences2[10])
-          sequences2[13] = reverseSeq(sequences2[13])
-          sequences2[16] = reverseSeq(sequences2[16])
-          print ("after")
-          i=0
-          for ele in sequences2:
-              i += 1
-              print(i, ". ", ele)
+          sequences2[9] = reverseSeq(sequences2[9])
+          sequences2[11] = reverseSeq(sequences2[11])
+          sequences2[14] = reverseSeq(sequences2[14])
+          sequences2[17] = reverseSeq(sequences2[17])
 
           #Only generate the squares whose value is higher than 80
-          #genMatrix2020(sequences2,80)
+          genMatrix2020(sequences2,80)
 
           #No lower bound, gives all the values
-          genMatrix2020(sequences2, -1)
+          #genMatrix2020(sequences2, -1)
 
           #Used to generate 2 alignments to test the output
           #genMatrixAlignement(sequences2[0], sequences2[1], True)
