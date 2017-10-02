@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.10.2)  2 OCT 2017 05:50
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (MiKTeX 2.9.6350 64-bit) (preloaded format=pdflatex 2017.10.2)  2 OCT 2017 06:36
 entering extended mode
 **./BioInfoDevoir1.tex
 (BioInfoDevoir1.tex
@@ -1276,16 +1276,36 @@ Overfull \hbox (190.05917pt too wide) in paragraph at lines 131--131
 TCCTGAATTTTAATTTTGTGTTGTCTCTC  
  []
 
-[6 <./Images/Reduction_trans_5.png>] [7] [8] (BioInfoDevoir1.aux) )
+[6 <./Images/Reduction_trans_5.png>] [7]
+<Images/gene_comparaison.png, id=59, 1096.095pt x 295.1025pt>
+File: Images/gene_comparaison.png Graphic file (type png)
+
+<use Images/gene_comparaison.png>
+Package pdftex.def Info: Images/gene_comparaison.png used on input line 138.
+(pdftex.def)             Requested size: 511.86491pt x 137.81111pt.
+
+<Images/gene_comparaison2.png, id=60, 1101.36469pt x 216.81pt>
+File: Images/gene_comparaison2.png Graphic file (type png)
+
+<use Images/gene_comparaison2.png>
+Package pdftex.def Info: Images/gene_comparaison2.png used on input line 143.
+(pdftex.def)             Requested size: 511.86491pt x 100.76266pt.
+
+Overfull \hbox (33.425pt too wide) in paragraph at lines 142--143
+[]  
+ []
+
+[8 <./Images/gene_comparaison.png> <./Images/gene_comparaison2.png>] [9]
+(BioInfoDevoir1.aux) )
 (\end occurred inside a group at level 1)
 
 ### simple group (level 1) entered at line 51 ({)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 15847 strings out of 493323
- 298153 string characters out of 3148143
+ 15857 strings out of 493323
+ 298452 string characters out of 3148143
  356920 words of memory out of 3000000
- 19028 multiletter control sequences out of 15000+200000
+ 19036 multiletter control sequences out of 15000+200000
  40347 words of font info for 40 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
  55i,13n,66p,981b,423s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -1297,9 +1317,9 @@ ublic/lm/lmcsc10.pfb><E:/tex/fonts/type1/public/lm/lmex10.pfb><E:/tex/fonts/typ
 e1/public/lm/lmmi10.pfb><E:/tex/fonts/type1/public/lm/lmmi8.pfb><E:/tex/fonts/t
 ype1/public/lm/lmr10.pfb><E:/tex/fonts/type1/public/lm/lmr12.pfb><E:/tex/fonts/
 type1/public/lm/lmsy10.pfb>
-Output written on BioInfoDevoir1.pdf (9 pages, 981305 bytes).
+Output written on BioInfoDevoir1.pdf (10 pages, 1046013 bytes).
 PDF statistics:
- 97 PDF objects out of 1000 (max. 8388607)
+ 104 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
- 58 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 68 words of extra memory for PDF output out of 10000 (max. 10000000)
 

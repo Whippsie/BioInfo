@@ -132,13 +132,25 @@ CATGATTCTTTTGCAGGGTGTTCATTTAGAAGAAAGCAACACTAATGATTCAAACAGCTTCCTGAATTTTAATTTTGTGT
 avec une longueur de 526. Les calculs ont été effectués dans le document calculfinal et le résultat complet se trouve dans le fichier totalefinale
 \newpage
 \textbf{Recherche d'introns et Blast} \\*[1cm]
+
 \quad 1. Identifier la protéine X au sein de la région génomique. \\*[5mm]
+ La première étape consiste à prendre le gêne et à le traduire en acides aminés avec la table génétique. Ensuite, on remarque un pattern assez évident.
+\includegraphics[width=\textwidth]{Images/gene_comparaison.png} \\*[5mm]
+On a donc les informations suivantes : 
+\begin{itemize}
+\item Extron : MCQRCGLKLIVIICFFVQLARDLLHPSLEEEKKKHKKKRLVQSPNSYFMDVKCPGKI \\*[5mm]
+On remarque que la suite du gêne est dans le brin codant 3 
+\includegraphics[width=\textwidth]{Images/gene_comparaison2.png} \\*[5mm]
+\item Extron : HCLFFFLVCYKITTVFSHAQTVVLCVGCSTVLCQPTGGKARLTEGLSFGILQPSDEIDDYKCLYLH pour le TTVFS jusqu'à KARLTEG \\*[5mm]
+Et la fin est dans le brin codant 2
+\item Extron : SNILKTSVFYLKVLFVIKIIAKVECTCLIYSHDSFADCSFRRKQH pour le CSFRRKQH \\*[5mm]
+\end{itemize}
 a) Dans quel cadre de lecture se trouve le codon start de la séquence protéique? \\*[3mm]
-\textbf{\underline{Réponse}:} Dans le deuxième brin codant. En effet, on remarque la combinaison ATG(M), suivi de TGC(C), CAG(Q), etc. à partir de la séquence commençant par GGA\\*[3mm]
+\textbf{\underline{Réponse}:} Dans le deuxième brin codant. En effet, on remarque la combinaison ATG(M), suivi de TGC(C), CAG(Q), etc. dans la séquence commençant par GGA\\*[3mm]
+
 b) Décrivez un algorithme de programmation dynamique qui vous permet de retrouver les différents fragments de la protéine X au sein de la séquence nucléotidique. \\*[3mm]
 \textbf{\underline{Réponse}:} Nous pouvons utiliser un algorithme d'\textbf{alignement total}. Dès que l'on obtient un mismatch ou un indel, on assigne cela à \textbf{un intron}. Si l'on doit assigner un extra à gauche ou bien à droite, on l'assigne à \textbf{un extron}. \\*[3mm]
 c) En déduire les intervalles de positions contenant les exons ainsi que la séquence de l'ARNm mature. \\*[3mm]
-\textbf{\underline{Réponse}:} Pour trouver la séquence d'ARN messager après épissage, il suffit de prendre le geneX et de le transformer à l'aide de la table génétique. En ce qui concerne les intervalles de positions, nous avons d'abord la séquence [1-55], puis la séquence [277-285] qui donne la séquence MCQRCGLKLIVIICFFVQLARDLLHPSLEEEKKKHKKKRLVQSPNSYFMDVKCPGCSFRRKQH. \\*[5mm]
 \quad 2. En vous servant de l'outil uniprot, identifiez le nom de la protéine X ainsi que sa fonction. \\*[5mm]
 \textbf{\underline{Réponse}:} La protéine en question est une \textbf{Ribosomal protein S27 homo sapiens (Human)}. Elle sert à contraindre des acides désoxyribonucléique ainsi que des acides ribonucléiques dans des ribosomes, ou elle lie des ions de Zinc.
 \end{document}
