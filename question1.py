@@ -327,7 +327,7 @@ def main():
       elif res == "2":
           sequences2 = fetchSequences("reads.fq")
           sequences2 = stripSeq(sequences2)
-          """  
+
           #Sequences tagged as reverse:9,14,17,11,8,6,5
           i =0
           for ele in sequences2:
@@ -346,7 +346,7 @@ def main():
           for ele in sequences2:
               i += 1
               print(i, ". ", ele)
-"""
+
           #Only generate the squares whose value is higher than 80
           #genMatrix2020(sequences2,80)
 
