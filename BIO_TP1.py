@@ -20,12 +20,14 @@ global MATCH
 global MISMATCH
 global INDEL
 global WANTEDSEQUENCES
-global seqfinale
+global SEQFINALE
+global SEUIL
 MATCH = 4
 MISMATCH = -4
 INDEL = -8
 WANTEDSEQUENCES = 'last' # Les options sont 'first' 'last' et 'all'
-seqfinale = []
+SEQFINALE = []
+SEUIL = 80
 ########################
 ### functions
 ########################
@@ -195,9 +197,6 @@ def genIndelEnd(s1,s2,end,size,sq1,sq2):
   return s1,s2
 
 
-
-
-
 """Génère la matrice 20 par 20 des séquences reads"""
 def genMatrix2020(sequences,seuil):
     # SCORE : M[RX,RY] SI RX SUFFIXE, RY PREFIXE
@@ -258,16 +257,16 @@ def genMatrixAlignement(seq1, seq2, show, seqfinale=""):
       #print (matrice)
       path, end = sequencePath(matrice, posFinal, seq1, seq2)
       aligned, alignValue = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
+      chevauchementFinal(aligned)
       print("Sequence 1: " + aligned[0])
       print("Sequence 2: " + aligned[1])
-      chevauchementFinal(aligned)
       print("Chevauchement: " + str(alignValue))
       print("Score: " + str(score))
 
   #Retourne le max ligne colonne pour la matrice 20x20
   return maxLigne, maxCol
 
-
+#Calcule le chevauchement en comparant les reads selon l'ordre trouvé
 def chevauchementFinal(aligned):
     k=0
     for i in aligned[0]:
@@ -275,10 +274,11 @@ def chevauchementFinal(aligned):
         if i=="-" or j== "-":
             pass
         elif i!=j:
-            seqfinale.append(Letter("Z",(i,j)))
+            SEQFINALE.append(Letter("Z", (i, j)))
         else:
-            seqfinale.append(Letter(i))
+            SEQFINALE.append(Letter(i))
         k+=1
+
 def findMax(matrice):
   shape = matrice.shape
   maxLigne,maxCol = 0,0
@@ -317,84 +317,85 @@ def stripSeq(seqList):
 ### main
 def main():
   while True:
-    #!IMPORTANT: Pour tester le bug, faire 3
-      res = input("1 pour comparer deux séquences, 2 pour voir la matrice d'adjacence 20x20, 3 POUR VOIR LE BUG \n")
+      res = input("1 pour comparer deux séquences, \n 2 pour voir la matrice d'adjacence 20x20, \n 3 pour reverse les séquences et pour voir la séquence finale \n")
       if res == "1":
           file = input("Veuillez entrer le nom du fichier avec son extension (ex: test.txt) \n")
           sequences1 = fetchSequences(file)
           sequences1 = stripSeq(sequences1)
           genMatrixAlignement(sequences1[0], sequences1[1], True)
-      elif res == "2":
-          sequences2 = fetchSequences("reads.fq")
-          sequences2 = stripSeq(sequences2)
-
-          #Sequences tagged as reverse:9,14,17,11,8,6,5
-          sequences2[5] = reverseSeq(sequences2[5])
-          sequences2[6] = reverseSeq(sequences2[6])
-          sequences2[8] = reverseSeq(sequences2[8])
-          sequences2[9] = reverseSeq(sequences2[9])
-          sequences2[11] = reverseSeq(sequences2[11])
-          sequences2[14] = reverseSeq(sequences2[14])
-          sequences2[17] = reverseSeq(sequences2[17])
-      elif res=="3":
-          sequences2 = fetchSequences("reads.fq")
-          sequences2 = stripSeq(sequences2)
-
-          choice = True
-          #Ordre reads : 16->5->6->8->3->15->11->12->18->14->19->17->9->0->4->2->7->10->13->1
-          genMatrixAlignement(sequences2[16], sequences2[5], choice)
-          genMatrixAlignement(sequences2[5], sequences2[6], choice)
-          genMatrixAlignement(sequences2[6], sequences2[8], choice)
-          genMatrixAlignement(sequences2[8], sequences2[3], choice)
-          genMatrixAlignement(sequences2[3], sequences2[15], choice)
-          genMatrixAlignement(sequences2[15], sequences2[11], choice)
-          genMatrixAlignement(sequences2[11], sequences2[12], choice)
-          genMatrixAlignement(sequences2[12], sequences2[18], choice)
-          genMatrixAlignement(sequences2[18], sequences2[14], choice)
-          genMatrixAlignement(sequences2[14], sequences2[19], choice)
-          genMatrixAlignement(sequences2[19], sequences2[17], choice)
-          genMatrixAlignement(sequences2[17], sequences2[9], choice)
-          genMatrixAlignement(sequences2[9], sequences2[0], choice)
-          genMatrixAlignement(sequences2[0], sequences2[4], choice)
-          genMatrixAlignement(sequences2[4], sequences2[2], choice)
-          genMatrixAlignement(sequences2[2], sequences2[7], choice)
-          genMatrixAlignement(sequences2[7], sequences2[10], choice)
-          genMatrixAlignement(sequences2[10], sequences2[13], choice)
-          genMatrixAlignement(sequences2[13], sequences2[1], choice)
-          monstring = ""
-          for i in range (len(seqfinale)):
-              if seqfinale[i].ambigu != ("Z","Z"):
-                  monstring+="(" + seqfinale[i].ambigu[0] + seqfinale[i].ambigu[1]+")"
-              else:
-                  monstring+=str(seqfinale[i].valeur)
-          print (monstring)
-
-
-
-
       else:
-          # Only generate the squares whose value is higher than 80
-          genMatrix2020(sequences2, 80)
+          sequences2 = fetchSequences("reads.fq")
+          sequences2 = stripSeq(sequences2)
+          if res == "2":
+              # Only generate the squares whose value is higher than 80
+              genMatrix2020(sequences2, SEUIL)
 
-          # No lower bound, gives all the values
-          # genMatrix2020(sequences2, -1)
-
-          # Used to generate 2 alignments to test the output
-          # genMatrixAlignement(sequences2[0], sequences2[1], True)
-          break
-
-  #Testing 1,2,3..
-  sequences3 = fetchSequences("test.txt")
-  sequences4 = fetchSequences("test2.txt")
-  sequences5 = fetchSequences("test3.txt")
-  sequences6 = fetchSequences("test5.txt")
-  sequences7 = ["GTAGACC", "AGCGTAGA"]
-  sequences6 = stripSeq(sequences3)
-  genMatrixAlignement(sequences6[0],sequences6[1],True)
-
-
+              # No lower bound, gives all the values
+              # genMatrix2020(sequences2, -1)
+          elif res == "3":
+              genSequencesPath(sequences2)
+              genSequenceFinale()
+          else:
+            break
+  testingSequences()
   return None
 
+def genSequencesPath(sequences2):
+    sequences2 = reverseSequences(sequences2)
+    choice = True
+    # Order reads : 16->5->6->8->3->15->11->12->18->14->19->17->9->0->4->2->7->10->13->1
+    genMatrixAlignement(sequences2[16], sequences2[5], choice)
+    genMatrixAlignement(sequences2[5], sequences2[6], choice)
+    genMatrixAlignement(sequences2[6], sequences2[8], choice)
+    genMatrixAlignement(sequences2[8], sequences2[3], choice)
+    genMatrixAlignement(sequences2[3], sequences2[15], choice)
+    genMatrixAlignement(sequences2[15], sequences2[11], choice)
+    genMatrixAlignement(sequences2[11], sequences2[12], choice)
+    genMatrixAlignement(sequences2[12], sequences2[18], choice)
+    genMatrixAlignement(sequences2[18], sequences2[14], choice)
+    genMatrixAlignement(sequences2[14], sequences2[19], choice)
+    genMatrixAlignement(sequences2[19], sequences2[17], choice)
+    genMatrixAlignement(sequences2[17], sequences2[9], choice)
+    genMatrixAlignement(sequences2[9], sequences2[0], choice)
+    genMatrixAlignement(sequences2[0], sequences2[4], choice)
+    genMatrixAlignement(sequences2[4], sequences2[2], choice)
+    genMatrixAlignement(sequences2[2], sequences2[7], choice)
+    genMatrixAlignement(sequences2[7], sequences2[10], choice)
+    genMatrixAlignement(sequences2[10], sequences2[13], choice)
+    genMatrixAlignement(sequences2[13], sequences2[1], choice)
+
+def genSequenceFinale():
+    # Build the final full sequence
+    monstring = ""
+    for i in range(len(SEQFINALE)):
+        # If the letters aren't the same (in which case ambigu equals the tuple (Z,Z)
+        if SEQFINALE[i].ambigu != ("Z", "Z"):
+            # Write the concatenation inside a panrethesis
+            monstring += "(" + SEQFINALE[i].ambigu[0] + SEQFINALE[i].ambigu[1] + ")"
+        else:
+            # Add that value
+            monstring += str(SEQFINALE[i].valeur)
+    print(monstring)
+
+def reverseSequences(sequences2):
+
+    # Sequences tagged as reverse:9,14,17,11,8,6,5
+    sequences2[5] = reverseSeq(sequences2[5])
+    sequences2[6] = reverseSeq(sequences2[6])
+    sequences2[8] = reverseSeq(sequences2[8])
+    sequences2[9] = reverseSeq(sequences2[9])
+    sequences2[11] = reverseSeq(sequences2[11])
+    sequences2[14] = reverseSeq(sequences2[14])
+    sequences2[17] = reverseSeq(sequences2[17])
+    return sequences2
+
+def testingSequences():
+    sequences3 = fetchSequences("test.txt")
+    sequences4 = fetchSequences("test2.txt")
+    sequences5 = fetchSequences("test3.txt")
+    sequences6 = fetchSequences("test5.txt")
+    sequences7 = ["GTAGACC", "AGCGTAGA"]
+    genMatrixAlignement(sequences6[0], sequences6[1], True)
 
 if __name__ == "__main__":
   main()
