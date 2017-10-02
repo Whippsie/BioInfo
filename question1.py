@@ -208,11 +208,32 @@ def genMatrix2020(sequences):
                 #On calcule le meilleur alignement de la colonne et de la ligne (Rx,Ry) et (Ry,Rx)
                 bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], False)
                 #TODO: iNVERSE? Pas sure si bestLigne en premier
-                matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
-                matrix[j][i] = bestLigne #Rx prefixe, Ry suffixe
-                print ("Seq ",i, " avec Seq ", j, "| Score:", bestCol, "|  Inverse: ", bestLigne)
+                if bestCol>bestLigne and bestCol>=80:
+                  matrix[i][j]=bestCol
+                  print("seq", i , " seq", j, " ", bestCol)
+                elif bestLigne>=80:
+                  matrix[j][i]=bestLigne
+                  print("seq", j, " seq", i, " ", bestLigne)
+                #matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
+                #matrix[j][i] = bestLigne #Rx prefixe, Ry suffixe
+                #print ("Seq ",i, " avec Seq ", j, "| Score:", bestCol, "|  Inverse: ", bestLigne)
+
   print (matrix)
 
+def reverseSeq(seq):
+  seqrev=""
+  for s in seq:
+    if s=="A":
+      seqrev="T"
+    elif s=="C":
+      seqrev="G"
+    elif s=="T":
+      seqrev="A"
+    elif s=="G":
+      seqrev="C"
+
+  seqrev=seqrev[::-1]
+  return seqrev
 
 def genMatrixAlignement(seq1, seq2, show):
   alignValue = '1'
@@ -223,7 +244,7 @@ def genMatrixAlignement(seq1, seq2, show):
   maxLigne, maxCol, score, posFinal = findMax(matrice)
   if show:
       #On affiche que le chevauchement optimal
-      #print (matrice)
+      print (matrice)
       path, end = sequencePath(matrice, posFinal, seq1, seq2)
       aligned, alignValue = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
       print("Sequence 1: " + aligned[0])
