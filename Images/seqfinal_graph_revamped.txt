@@ -1,0 +1,41 @@
+seq0  seq4   500.0
+seq9  seq0   804.0
+seq13  seq1   1060.0
+seq4  seq2   1016.0
+seq2  seq7   644.0
+seq8  seq3   1068.0
+seq3  seq15   1032.0
+seq5  seq6   720.0
+seq16  seq5   672.015
+seq6  seq8   1044.0
+seq7  seq10   1072.0
+seq17  seq9   904.0
+seq10  seq13   492.0
+seq11  seq12   860.0
+seq15  seq11   996.0
+seq12  seq18   732.0
+seq18  seq14   632.0
+seq14  seq19   908.0
+seq19  seq17   1004.0
+
+Ordre reads : 16->5->6->8->3->15->11->12->18->14->19->17->9->0->4->2->7->10->13->1
+Chevauchement
+Chevauchement 16->5: 197
+Chevauchement 5->6: 194
+Chevauchement 6->8: 283
+Chevauchement 8->3: 184
+Chevauchement 3->15: 276
+Chevauchement 15->11: 197
+Chevauchement 11->12: 107
+Chevauchement 12->18: 199
+Chevauchement 18->14: 17
+Chevauchement 14->19: 25
+Chevauchement 19->17: 33
+Chevauchement 17->9: 258
+Chevauchement 9->0: 15
+Chevauchement 0->4: 133
+Chevauchement 4->2: 280
+Chevauchement 2->7: 169
+Chevauchement 7->10: 292
+Chevauchement 10->13: 135
+Chevauchement 13->1: 281

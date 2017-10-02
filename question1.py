@@ -20,10 +20,12 @@ global MATCH
 global MISMATCH
 global INDEL
 global WANTEDSEQUENCES
+global seqfinale
 MATCH = 4
 MISMATCH = -4
 INDEL = -8
 WANTEDSEQUENCES = 'last' # Les options sont 'first' 'last' et 'all'
+
 ########################
 ### functions
 ########################
@@ -239,46 +241,46 @@ def reverseSeq(seq):
 
   return seqrev
 
-def genMatrixAlignement(seq1, seq2, show):
+class Letter:
+    def __init__(self, val, ambigu=("Z","Z")):
+        self.valeur = val
+        self.ambigu = ambigu
+
+
+def genMatrixAlignement(seq1, seq2, show, seqfinale=""):
   alignValue = '1'
   matrice = np.zeros(shape=(len(seq1)+1, len(seq2)+ 1))
-  #matrice = sequenceMatrix(len(seq1), len(seq2))
   matrice = fillMatrix(matrice, seq1, seq2)
-  """print("prem:",seq2[299])
-
-  print("trois:",seq2[298])
-
-  print("quat:",seq2[297])
-
-  print("quat:",seq2[296])
-
-  print("quat:",seq2[295])
-
-  print ("skip")
-  print("quat:",seq1[4])
-  print("deux:",seq1[3])
-  print("quat:",seq1[2])
-  print("quat:",seq1[1])
-  print("quat:",seq1[0])
-"""
   # Trouve le score et la position totale, en plus de la valeur maximale de la ligne et colonne
   maxLigne, maxCol, score, posFinal = findMax(matrice)
   if show:
       #On affiche que le chevauchement optimal
       #print (matrice)
       path, end = sequencePath(matrice, posFinal, seq1, seq2)
-      #print (path)
-      #print ("end ",end)
-      #print ("final ",posFinal)
       aligned, alignValue = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
       print("Sequence 1: " + aligned[0])
       print("Sequence 2: " + aligned[1])
+      chevauchementFinal(aligned)
       print("Chevauchement: " + str(alignValue))
       print("Score: " + str(score))
 
   #Retourne le max ligne colonne pour la matrice 20x20
   return maxLigne, maxCol
 
+
+def chevauchementFinal(aligned):
+    k=0
+    for i in aligned[0]:
+        j = aligned[1][k]
+        if i=="-":
+            seqfinale.append(Letter(j))
+        elif j=="-":
+            seqfinale.append(Letter(i))
+        elif i!=j:
+            seqfinale.append(Letter("Z",(i,j)))
+        else:
+            seqfinale.append(Letter(i))
+        k+=1
 def findMax(matrice):
   shape = matrice.shape
   maxLigne,maxCol = 0,0
@@ -316,6 +318,7 @@ def stripSeq(seqList):
 
 ### main
 def main():
+  seqfinale = []
   while True:
     #!IMPORTANT: Pour tester le bug, faire 3
       res = input("1 pour comparer deux séquences, 2 pour voir la matrice d'adjacence 20x20, 3 POUR VOIR LE BUG \n")
@@ -336,16 +339,48 @@ def main():
           sequences2[11] = reverseSeq(sequences2[11])
           sequences2[14] = reverseSeq(sequences2[14])
           sequences2[17] = reverseSeq(sequences2[17])
+      elif res=="3":
+          sequences2 = fetchSequences("reads.fq")
+          sequences2 = stripSeq(sequences2)
 
-          #Only generate the squares whose value is higher than 80
-          genMatrix2020(sequences2,80)
+          choice = False
+          #Ordre reads : 16->5->6->8->3->15->11->12->18->14->19->17->9->0->4->2->7->10->13->1
+          genMatrixAlignement(sequences2[16], sequences2[5], choice)
+          genMatrixAlignement(sequences2[5], sequences2[6], choice)
+          genMatrixAlignement(sequences2[6], sequences2[8], choice)
+          genMatrixAlignement(sequences2[8], sequences2[3], choice)
+          genMatrixAlignement(sequences2[3], sequences2[15], choice)
+          genMatrixAlignement(sequences2[15], sequences2[11], choice)
+          genMatrixAlignement(sequences2[11], sequences2[12], choice)
+          genMatrixAlignement(sequences2[12], sequences2[18], choice)
+          genMatrixAlignement(sequences2[18], sequences2[14], choice)
+          genMatrixAlignement(sequences2[14], sequences2[19], choice)
+          genMatrixAlignement(sequences2[19], sequences2[17], choice)
+          genMatrixAlignement(sequences2[17], sequences2[9], choice)
+          genMatrixAlignement(sequences2[9], sequences2[0], choice)
+          genMatrixAlignement(sequences2[0], sequences2[4], choice)
+          genMatrixAlignement(sequences2[4], sequences2[2], choice)
+          genMatrixAlignement(sequences2[2], sequences2[7], choice)
+          genMatrixAlignement(sequences2[7], sequences2[10], choice)
+          genMatrixAlignement(sequences2[10], sequences2[13], choice)
+          genMatrixAlignement(sequences2[13], sequences2[1], choice)
+          monstring = ""
+          for i in range (len(seqfinale)):
+              if seqfinale[i].ambigu != ("Z","Z"):
+                  monstring+=seqfinale[i].ambigu
+              else:
+                  monstring+=seqfinale[i].valeur
+          print (monstring)
 
-          #No lower bound, gives all the values
-          #genMatrix2020(sequences2, -1)
-
-          #Used to generate 2 alignments to test the output
-          #genMatrixAlignement(sequences2[0], sequences2[1], True)
       else:
+          # Only generate the squares whose value is higher than 80
+          genMatrix2020(sequences2, 80)
+
+          # No lower bound, gives all the values
+          # genMatrix2020(sequences2, -1)
+
+          # Used to generate 2 alignments to test the output
+          # genMatrixAlignement(sequences2[0], sequences2[1], True)
           break
 
   #Testing 1,2,3..
