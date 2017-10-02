@@ -18,7 +18,6 @@
 \usepackage{graphicx}
 
 % PACKAGES
-\usepackage{karnaugh-map}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{tikz}
@@ -41,8 +40,8 @@
 \large par: \\*
 André Lalonde \\* % ***éditez ceci***
 (20024885) \\*[1cm] % ***éditez ceci***
-Maude Qqc \\*
-(xxxxxxxx) \\*[6cm]
+Maude Sabourin \\*
+(p1141140) \\*[6cm]
 {\large \today}\\[2cm]
 
 \vfill
@@ -52,9 +51,8 @@ Maude Qqc \\*
 \par{
 \textbf{Chevauchement de séquences} \\*[1cm]
 \quad 1. Quelle est la différence entre un tel alignement et l'alignement global? \\*[5mm]
-\textbf{\underline{Réponse}:} Un tel alignement recherche le meilleur match au travers d'une séquence sans obligatoirement devoir prendre l'alignement au complet. Il peut avoir un préfixe et/ou un suffixe qui ne fait pas partie de l'alignement. \\*[5mm]
-\quad 2. Quelles doivent être les valeurs de la première ligne $(V(0,j) \ \forall j)$? et celles de la première colonne $(V(i,0) \ \forall i)$ de la table de programmation dynamique $V$? \\*[5mm]
-\textbf{\underline{Réponse}:} Puisque l'alignement permet d'avoir un préfixe et/ou un suffixe, la première rangée ainsi que la première colonne ne contient que des 0. Étant donné que l'on a pas de restriction tant qu'au nombre de caractères qui doivent être matcher dans la séquence, on ne pénalise pas un "décalage initiale" puisque l'on peu démarrer de n'importe quel paire de séquence. \\*[5mm]
+\textbf{\underline{Réponse}:} Un tel alignement recherche le meilleur match au travers d'une séquence sans obligatoirement devoir prendre l'alignement au complet. Nous avons donc une seule séquence qui ne doit pas prendre d'indel au départ, et une seule qui ne dofait pas prendre d'indel à la n. artie de l'alignement. \\*[5mm]    ent être les valeurs de la première ligne $(V(0,j) \ \forall j)$? et celles de la première colonne $(V(i,0) \ \forall i)$ de la table de programmation dynamique $V$? \\*[5mm]
+\textbf{\underline{Réponse}:} Puisque l'alignement permet d'avoir un préfixe et/ou un suffixe, la première rangée ainsi que la première colonne ne contienent que des 0. Étant donné que l'on a pas de restriction tant qu'au nombre de caractères qui doivent être matcher dans la séquence, on ne pénalise pas un "décalage initiale" puisque l'on peu démarrer de n'importe quel des deux séquences. \\*[5mm]
 \quad 3. Quelles sont les équations de récurrence à utiliser pour remplir la table de programmation dynamique? \\*[5mm]
 \textbf{\underline{Réponse}:} Les équations sont \\*[3mm]
 \center
@@ -71,9 +69,34 @@ Maude Qqc \\*
 \end{equation} \\*[5mm]
 \flushleft
 \quad 4. Comment peut-on retrouver l'alignement avec le meilleur chevauchement à partir de la table de programmation dynamique? \\*[5mm]
-\textbf{\underline{Réponse}:} Premièrement, on cherche dans le tableau la plus grande valeur, qui sera la case de départ. Par la suite, on prend la plus grande valeur entre la case du haut, celle de gauche, et celle en haut à gauche. Lorsque l'on se déplace dans la direction $\nwarrow$, les deux caractères sont un "match" et on écrit donc les deux caractères de la case $V(i,j)$. Lorsque l'on se déplace dans la direction $\uparrow$, alors on "match" le caractère de la ligne $i$ avec un indel. De façon similaire, lorsque l'on se déplace vers $\leftarrow$, alors on "match" le caractère de la ligne $j$ avec un indel. Lorsque l'on arrive sur une case qui vaut 0, on arrête la procédure. \\*[5mm]
-\quad 5. Voir le fichier question1.py \\
+\textbf{\underline{Réponse}:} Premièrement, on cherche dans le tableau la plus grande valeur sur la dernière ligne ou la dernière colonne, qui sera la case de départ. Par la suite, on vérifie le score de la case sur laquelle on se trouve et les trois cases ($\uparrow, \nwarrow, \leftarrow$) pour s'assurer que le score équivaut bien aux équations de récurrence à gauche. Lorsque l'on se déplace dans la direction $\nwarrow$, les deux casont un "match" et on écrit donc les deux caractères de la case $V(i,j)$. Lorsque l'on se déplace dans la direction $\uparrow$, alors on "match" le caractère de la ligne $i$ avec un indel. De façon similaire, lorsque l'on se déplace vers $\leftarrow$, alors on "match" le caractère de la ligne $j$ avec un indel. Lorsque l'on arrive sur une case qui vaut 0, on arrête la procédure et on se dirige vers la case $V(0,0)$ en alignant avec des indels le reste de la séquence. \\*[5mm]
+\quad 5. Voir le fichier TP1.py et suivre les directives. \\
 \newpage
 \textbf{Assemblage de fragments} \\*[1cm]
-\quad 1. Pour chaque paire de reads $\{R_x, R_y \}$, calculer le score de l'alignement correspondant au chevauchement maximal entre $R_x$ et $R_y$. %matrice 20x20 diagonal = 0
+\quad 1. Pour chaque paire de reads $\{R_x, R_y \}$, calculer le score de l'alignement correspondant au chevauchement maximal entre $R_x$ et $R_y$. \\*[5mm]
+\includegraphics[width=\textwidth]{Images/Matrix_assemblage_no1.png} \\*[5mm]
+\quad 2. En déduire le graphe orienté de chevauchement $G = (V,E)$. \\*[5mm]
+\centering
+\includegraphics[width=0.25\textwidth]{Images/Assemblage_no2_initial.png}\\*[5mm]
+\newpage
+\flushleft
+a) Quel effet à un seuil minimum de score de 80 sur le graphe résultant? \\*[3mm]
+\includegraphics[width=\textwidth]{Images/Assemblage_no2_plus80.png} \\*[3mm]
+\textbf{\underline{Réponse}:} Comme on peut le constater en comparant les deux figures précédentes, l'ajout d'un seuil a eu pour effet de diluer la grande majorité des arêtes de $V$. Cela a transformer le \textbf{tas} de séquences en une \textbf{série de séquences} presque linéaire, ce qui nous permet de distinguer les \textbf{patterns} dans les séquences. \\*[3mm]
+b) Sachant que le read @READS\_2 est forward, déduisez-en l'ensemble des reads reverse. \\*[3mm]
+\textbf{\underline{Réponse}:} L'ensemble des reads reverse est: <list> \\*[5mm]
+\quad 3. a) Construire le nouveau graphe de chevauchement en remplaçant les séquences identifiés comme étant des reads reverse par leur complément $X^r_c$. \\*[3mm]
+%\includegraphics{folderImageName/graphenumero3}
+
+\newpage
+\textbf{Recherche d'introns et Blast} \\*[1cm]
+\quad 1. Identifier la protéine X au sein de la région génomique. \\*[5mm]
+a) Dans quel cadre de lecture se trouve le codon start de la séquence protéique? \\*[3mm]
+\textbf{\underline{Réponse}:} Dans le deuxième brin codant (ATG, TGC, CAG, CGT, TGT, GGT, ... ect) \\*[3mm]
+b) Décrivez un algorithme de programmation dynamique qui vous permet de retrouver les différents fragments de la protéine X au sein de la séquence nucléotidique. \\*[3mm]
+\textbf{\underline{Réponse}:} Nous pouvons utiliser un algorithme d'\textbf{alignement total}. Dès que l'on obtiens un mismatch ou un indel, on assigne cela à \textbf{un intron}. Si l'on doit assigner un extra à gauche ou bien à droite, on l'assigne à \textbf{un extron}. \\*[3mm]
+c) En déduire les intervalles de positions contenant les exons ainsi que la séquence de l'ARNm mature. \\*[3mm]
+\textbf{\underline{Réponse}:} Pour trouver la séquence d'ARN messager après épissage, il suffit de prendre le geneX et de le transformer à l'aide de la table de programmation dynamique. En ce qui concerne les intervalles de positions, c'est à voir cas par cas puisqu'ils sont, habituellement, différents. \\*[5mm]
+\quad 2. En vous servant de l'outil uniprot, identifiez le nom de la protéine X ainsi que sa fonction. \\*[5mm]
+\textbf{\underline{Réponse}:} La protéine en question est une \textbf{Ribosomal protein S27 homo sapiens (Human)}. Elle sert à contraindre des acides désoxyribonucléique ainsi que des acides ribonucléiques dans des ribosomes, ou elle lie des ions de Zinc.
 \end{document}
