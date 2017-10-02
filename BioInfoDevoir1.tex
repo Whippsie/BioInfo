@@ -86,8 +86,12 @@ a) Quel effet à un seuil minimum de score de 80 sur le graphe résultant? \\*[3
 b) Sachant que le read @READS\_2 est forward, déduisez-en l'ensemble des reads reverse. \\*[3mm]
 \textbf{\underline{Réponse}:} L'ensemble des reads reverse est: 5,6,8,9,11,14 et 17. \\*[5mm]
 \quad 3. a) Construire le nouveau graphe de chevauchement en remplaçant les séquences identifiés comme étant des reads reverse par leur complément $X^r_c$. \\*[3mm]
-%\includegraphics{folderImageName/graphenumero3}
-
+\includegraphics[width=\textwidth]{Images/Assemblage_no3_a).png} \\*[3mm]
+b) Appliquez la réduction transitive au graphe ci-dessus. \\*[5mm]
+\includegraphics[width=\textwidth]{Images/graphe_final.png} \\*[5mm]
+c) Déduire la séquence du fragment génomique séquencé et sa longueur. \\*[3mm]
+La séquence est : des pages de long \\*[2mm]
+avec une longueur de 11000. \\*
 \newpage
 \textbf{Recherche d'introns et Blast} \\*[1cm]
 \quad 1. Identifier la protéine X au sein de la région génomique. \\*[5mm]
@@ -96,7 +100,7 @@ a) Dans quel cadre de lecture se trouve le codon start de la séquence protéiqu
 b) Décrivez un algorithme de programmation dynamique qui vous permet de retrouver les différents fragments de la protéine X au sein de la séquence nucléotidique. \\*[3mm]
 \textbf{\underline{Réponse}:} Nous pouvons utiliser un algorithme d'\textbf{alignement total}. Dès que l'on obtiens un mismatch ou un indel, on assigne cela à \textbf{un intron}. Si l'on doit assigner un extra à gauche ou bien à droite, on l'assigne à \textbf{un extron}. \\*[3mm]
 c) En déduire les intervalles de positions contenant les exons ainsi que la séquence de l'ARNm mature. \\*[3mm]
-\textbf{\underline{Réponse}:} Pour trouver la séquence d'ARN messager après épissage, il suffit de prendre le geneX et de le transformer à l'aide de la table de programmation dynamique. En ce qui concerne les intervalles de positions, c'est à voir cas par cas puisqu'ils sont, habituellement, différents. \\*[5mm]
+\textbf{\underline{Réponse}:} Pour trouver la séquence d'ARN messager après épissage, il suffit de prendre le geneX et de le transformer à l'aide de la table génétique. En ce qui concerne les intervalles de positions, nous avons d'abord la séquence [1-55], puis la séquence [277-285] qui donne la séquence MCQRCGLKLIVIICFFVQLARDLLHPSLEEEKKKHKKKRLVQSPNSYFMDVKCPGCSFRRKQH. \\*[5mm]
 \quad 2. En vous servant de l'outil uniprot, identifiez le nom de la protéine X ainsi que sa fonction. \\*[5mm]
 \textbf{\underline{Réponse}:} La protéine en question est une \textbf{Ribosomal protein S27 homo sapiens (Human)}. Elle sert à contraindre des acides désoxyribonucléique ainsi que des acides ribonucléiques dans des ribosomes, ou elle lie des ions de Zinc.
 \end{document}
