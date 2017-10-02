@@ -149,8 +149,9 @@ a) Dans quel cadre de lecture se trouve le codon start de la séquence protéiqu
 \textbf{\underline{Réponse}:} Dans le deuxième brin codant. En effet, on remarque la combinaison ATG(M), suivi de TGC(C), CAG(Q), etc. dans la séquence commençant par GGA\\*[3mm]
 
 b) Décrivez un algorithme de programmation dynamique qui vous permet de retrouver les différents fragments de la protéine X au sein de la séquence nucléotidique. \\*[3mm]
-\textbf{\underline{Réponse}:} Nous pouvons utiliser un algorithme d'\textbf{alignement total}. Dès que l'on obtient un mismatch ou un indel, on assigne cela à \textbf{un intron}. Si l'on doit assigner un extra à gauche ou bien à droite, on l'assigne à \textbf{un extron}. \\*[3mm]
+\textbf{\underline{Réponse}:} On veut comparer l'ARN messager qui a subit l'épissage avec la séquence génomique, car l'alignement devrait être très élevé. Dès que l'on a des indels, on considère que l'on est en présence d'introns. On fait donc une comparaison globale de ces deux séquences }. \\*[3mm]
 c) En déduire les intervalles de positions contenant les exons ainsi que la séquence de l'ARNm mature. \\*[3mm]
+Nous avons commencé à écrire un programme pour comparer l'ARNm mature et la séquence génomique, mais nous avons manqué de temps pour l'analyse et n'avons ainsi pas bien saisi comment calculer les intervalles entre les exons. \\*[3mm]
 \quad 2. En vous servant de l'outil uniprot, identifiez le nom de la protéine X ainsi que sa fonction. \\*[5mm]
 \textbf{\underline{Réponse}:} La protéine en question est une \textbf{Ribosomal protein S27 homo sapiens (Human)}. Elle sert à contraindre des acides désoxyribonucléique ainsi que des acides ribonucléiques dans des ribosomes, ou elle lie des ions de Zinc.
 \end{document}
