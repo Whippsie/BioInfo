@@ -25,7 +25,7 @@ MATCH = 4
 MISMATCH = -4
 INDEL = -8
 WANTEDSEQUENCES = 'last' # Les options sont 'first' 'last' et 'all'
-
+seqfinale = []
 ########################
 ### functions
 ########################
@@ -272,10 +272,8 @@ def chevauchementFinal(aligned):
     k=0
     for i in aligned[0]:
         j = aligned[1][k]
-        if i=="-":
-            seqfinale.append(Letter(j))
-        elif j=="-":
-            seqfinale.append(Letter(i))
+        if i=="-" or j== "-":
+            pass
         elif i!=j:
             seqfinale.append(Letter("Z",(i,j)))
         else:
@@ -318,7 +316,6 @@ def stripSeq(seqList):
 
 ### main
 def main():
-  seqfinale = []
   while True:
     #!IMPORTANT: Pour tester le bug, faire 3
       res = input("1 pour comparer deux séquences, 2 pour voir la matrice d'adjacence 20x20, 3 POUR VOIR LE BUG \n")
@@ -343,7 +340,7 @@ def main():
           sequences2 = fetchSequences("reads.fq")
           sequences2 = stripSeq(sequences2)
 
-          choice = False
+          choice = True
           #Ordre reads : 16->5->6->8->3->15->11->12->18->14->19->17->9->0->4->2->7->10->13->1
           genMatrixAlignement(sequences2[16], sequences2[5], choice)
           genMatrixAlignement(sequences2[5], sequences2[6], choice)
@@ -367,10 +364,13 @@ def main():
           monstring = ""
           for i in range (len(seqfinale)):
               if seqfinale[i].ambigu != ("Z","Z"):
-                  monstring+=seqfinale[i].ambigu
+                  monstring+="(" + seqfinale[i].ambigu[0] + seqfinale[i].ambigu[1]+")"
               else:
-                  monstring+=seqfinale[i].valeur
+                  monstring+=str(seqfinale[i].valeur)
           print (monstring)
+
+
+
 
       else:
           # Only generate the squares whose value is higher than 80
