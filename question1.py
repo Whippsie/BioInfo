@@ -68,10 +68,11 @@ def fillMatrix(matrix, seq1, seq2):
   #   colonne remplis avec des zéros et on applique   #
   #   l'algorithme de remplissage de score.           #
   #   Match = +4, Mismatch = -4, Indel = -8         ###
-  for i in range(1,len(matrix)):
-    for j in range(1,matrix[i].size):
+  shape = matrix.shape
+  for i in range(1,shape[0]):
+    for j in range(1,shape[1]):
       match = matching(seq1[i-1],seq2[j-1])
-      matrix[i][j] = max(0, matrix[i-1][j-1]+match, matrix[i][j-1]+INDEL, matrix[i-1][j]+INDEL)
+      matrix[i][j] = max(matrix[i-1][j-1]+match, matrix[i][j-1]+INDEL, matrix[i-1][j]+INDEL)
   return matrix
 
 ### match mismatch or indel? return score
@@ -196,7 +197,7 @@ def genIndelEnd(s1,s2,end,size,sq1,sq2):
 
 
 """Génère la matrice 20 par 20 des séquences reads"""
-def genMatrix2020(sequences):
+def genMatrix2020(sequences,seuil):
     # SCORE : M[RX,RY] SI RX SUFFIXE, RY PREFIXE
     #TODO:Remove hardcoded
   matrix = np.zeros(shape=(20, 20))
@@ -206,12 +207,12 @@ def genMatrix2020(sequences):
         if not(i==j):
             if (i<j):
                 #On calcule le meilleur alignement de la colonne et de la ligne (Rx,Ry) et (Ry,Rx)
-                bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], False)
+                bestLigne,bestCol = genMatrixAlignement(sequences[i], sequences[j], True)
                 #TODO: iNVERSE? Pas sure si bestLigne en premier
-                if bestCol>bestLigne and bestCol>=80:
+                if bestCol>bestLigne and bestCol>=seuil:
                   matrix[i][j]=bestCol
                   print("seq", i , " seq", j, " ", bestCol)
-                elif bestLigne>=80:
+                elif bestLigne>=seuil:
                   matrix[j][i]=bestLigne
                   print("seq", j, " seq", i, " ", bestLigne)
                 #matrix[i][j] = bestCol #Rx suffixe, Ry prefixe
@@ -224,28 +225,51 @@ def reverseSeq(seq):
   seqrev=""
   for s in seq:
     if s=="A":
-      seqrev="T"
+      seqrev+="T"
     elif s=="C":
-      seqrev="G"
+      seqrev+="G"
     elif s=="T":
-      seqrev="A"
+      seqrev+="A"
     elif s=="G":
-      seqrev="C"
+      seqrev+="C"
 
-  seqrev=seqrev[::-1]
+  l=list(seqrev)
+  l.reverse()
+  seqrev =''.join(l)
+
   return seqrev
 
 def genMatrixAlignement(seq1, seq2, show):
   alignValue = '1'
-  matrice = sequenceMatrix(len(seq1), len(seq2))
+  matrice = np.zeros(shape=(len(seq1)+1, len(seq2)+ 1))
+  #matrice = sequenceMatrix(len(seq1), len(seq2))
   matrice = fillMatrix(matrice, seq1, seq2)
+  """print("prem:",seq2[299])
 
+  print("trois:",seq2[298])
+
+  print("quat:",seq2[297])
+
+  print("quat:",seq2[296])
+
+  print("quat:",seq2[295])
+
+  print ("skip")
+  print("quat:",seq1[4])
+  print("deux:",seq1[3])
+  print("quat:",seq1[2])
+  print("quat:",seq1[1])
+  print("quat:",seq1[0])
+"""
   # Trouve le score et la position totale, en plus de la valeur maximale de la ligne et colonne
   maxLigne, maxCol, score, posFinal = findMax(matrice)
   if show:
       #On affiche que le chevauchement optimal
-      print (matrice)
+      #print (matrice)
       path, end = sequencePath(matrice, posFinal, seq1, seq2)
+      #print (path)
+      #print ("end ",end)
+      #print ("final ",posFinal)
       aligned, alignValue = alignSequences(end, path, seq1, seq2, posFinal, matrice.shape)
       print("Sequence 1: " + aligned[0])
       print("Sequence 2: " + aligned[1])
@@ -303,16 +327,44 @@ def main():
       elif res == "2":
           sequences2 = fetchSequences("reads.fq")
           sequences2 = stripSeq(sequences2)
-          genMatrix2020(sequences2)
+          """  
+          #Sequences tagged as reverse:9,14,17,11,8,6,5
+          i =0
+          for ele in sequences2:
+              i+=1
+              print (i,". ",ele)
+
+          sequences2[4] = reverseSeq(sequences2[4])
+          sequences2[5] = reverseSeq(sequences2[5])
+          sequences2[7] = reverseSeq(sequences2[7])
+          sequences2[8] = reverseSeq(sequences2[8])
+          sequences2[10] = reverseSeq(sequences2[10])
+          sequences2[13] = reverseSeq(sequences2[13])
+          sequences2[16] = reverseSeq(sequences2[16])
+          print ("after")
+          i=0
+          for ele in sequences2:
+              i += 1
+              print(i, ". ", ele)
+"""
+          #Only generate the squares whose value is higher than 80
+          #genMatrix2020(sequences2,80)
+
+          #No lower bound, gives all the values
+          genMatrix2020(sequences2, -1)
+
+          #Used to generate 2 alignments to test the output
+          #genMatrixAlignement(sequences2[0], sequences2[1], True)
       else:
           break
 
+  #Testing 1,2,3..
   sequences3 = fetchSequences("test.txt")
   sequences4 = fetchSequences("test2.txt")
   sequences5 = fetchSequences("test3.txt")
   sequences6 = fetchSequences("test5.txt")
   sequences7 = ["GTAGACC", "AGCGTAGA"]
-  sequences6 = stripSeq(sequences7)
+  sequences6 = stripSeq(sequences3)
   genMatrixAlignement(sequences6[0],sequences6[1],True)
 
 
